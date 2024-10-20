@@ -1,5 +1,7 @@
+#!/usr/bin/env python3
+
+
 import cv2
-from functools import partial
 import json
 
 def save(event,x,y,flags,param):
@@ -8,7 +10,7 @@ def save(event,x,y,flags,param):
 
 def onTrackbar(threshold, mm, C,limits):
     limits[C][mm] = threshold
-        
+
 
 def main():
     window_name = "Video"
