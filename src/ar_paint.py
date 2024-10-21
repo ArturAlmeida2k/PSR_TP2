@@ -1,78 +1,41 @@
 #!/usr/bin/env python3
 
 
+#  ------------------------------
+#  -----      Imports       -----
+#  ------------------------------
 import cv2
 import json
-import numpy as np
 from utils.argumentParser import parseArguments
+from utils.functions import *
 from datetime import datetime
 
+
+
+#  ------------------------------
+#  -----     Variables      -----
+#  ------------------------------
 global path
 
-def setup_video_capture():
-    # Iniciar a captura de vídeo
-    cap = cv2.VideoCapture(0)  # '0' indica a webcam padrão. Altere se necessário.
-    
-    # Verificar se a câmera foi inicializada corretamente
-    if not cap.isOpened():
-        print("Erro: Não foi possível abrir a câmara.")
-        exit()
-
-    # Opcional: Definir a resolução do vídeo (pode ajustar conforme necessário)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-
-    return cap
 
 
-def create_blank_canvas(width, height):
-    # Criar uma imagem branca com as mesmas dimensões da captura de vídeo
-    canvas = 255 * np.ones(shape=[height, width, 3], dtype=np.uint8)  # Imagem RGB branca
-    return canvas
 
-def get_largest_contour(mask):
-    # Encontrar todos os contornos na máscara
-    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    
-    # Se nenhum contorno for encontrado
-    if len(contours) == 0:
-        return None
-    
-    # Encontrar o maior contorno
-    largest_contour = max(contours, key=cv2.contourArea)
-    
-    return largest_contour
-
-def get_centroid(contour):
-    M = cv2.moments(contour)
-    
-    if M["m00"] == 0:  # Evitar divisão por zero
-        return None
-    
-    # Cálculo das coordenadas do centróide
-    cx = int(M["m10"] / M["m00"])
-    cy = int(M["m01"] / M["m00"])
-    
-    return (cx, cy)
-
+#  ------------------------------
+#  -----     Functions      -----
+#  ------------------------------
 def main():
     global path
     
     with open(path,"r") as json_file:
         limits = json.load(json_file)["limits"]
-    
-    #limits = limits["limits"]
 
-    cap = setup_video_capture()
+    cap = start_video_capture()
 
     ret, frame = cap.read()
-    if ret:
-        height, width, _ = frame.shape
-        canvas = create_blank_canvas(width, height)
-    else:
-        print("Erro ao capturar a primeira imagem da câmara.")
-        cap.release()
-        return
+    
+    height, width, _ = frame.shape
+    canvas = create_blank_canvas(width, height)
+    
     
      # Variáveis para o lápis
     last_centroid = None  # Ponto anterior (para desenhar linhas)
@@ -126,7 +89,7 @@ def main():
         elif k == ord("-"):
             pencil_thickness = max(pencil_thickness - 1,1)
         elif k == ord("c"):
-            canvas = create_blank_canvas(width, height)
+            canvas.fill(255)
         elif k == ord("w"):
             now = datetime.now()
             formatted_time = now.strftime("drawing_%a_%b_%d_%H:%M:%S_%Y.png")
@@ -135,12 +98,10 @@ def main():
             cv2.imwrite(formatted_time, canvas)
             print(f"Imagem salva como {formatted_time}")
         elif k == ord("q"):
+            cap.release()
+            cv2.destroyAllWindows()
             break
-
-
-    # Liberar a captura e fechar as janelas
-    cap.release()
-    cv2.destroyAllWindows()
+   
 
 
 
