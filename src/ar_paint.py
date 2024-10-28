@@ -6,25 +6,24 @@
 #  ------------------------------
 import cv2
 import json
+import math
+import numpy as np
 from utils.argumentParser import parseArguments
 from utils.functions import *
 from datetime import datetime
 
 
-
 #  ------------------------------
 #  -----     Variables      -----
 #  ------------------------------
-global path
-
-
+global path, shake
 
 
 #  ------------------------------
 #  -----     Functions      -----
 #  ------------------------------
 def main():
-    global path
+    global path, shake
     
     with open(path,"r") as json_file:
         limits = json.load(json_file)["limits"]
@@ -63,7 +62,8 @@ def main():
                                markerSize=20, thickness=2)
                 
                 # 5. Usar o centroide para desenhar na tela (canvas)
-                if last_centroid is not None:
+                if (last_centroid is not None and not shake) or (last_centroid is not None and math.sqrt(abs((last_centroid[0]-centroid[0])**2+(last_centroid[1]-centroid[1])**2)) < 50 and shake):
+                    
                     # Desenhar uma linha da última posição para a nova
                     cv2.line(canvas, last_centroid, centroid, pencil_color, pencil_thickness)
                 
@@ -104,14 +104,13 @@ def main():
    
 
 
-
 #  ------------------------------
 #  -----    Startup Code    -----
 #  ------------------------------
 if __name__ == '__main__':
 
     #  Retrieve all the arguments
-    path = parseArguments()
+    path, shake = parseArguments()
 
     #  Call the main code
     main()
