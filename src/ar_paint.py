@@ -26,9 +26,11 @@ global path
 def main():
     global path
     
+    # Abrir o ficheiro limits.json em modo leitura
     with open(path,"r") as json_file:
         limits = json.load(json_file)["limits"]
 
+    # Iniciar a captura da câmara
     cap = start_video_capture()
 
     ret, frame = cap.read()
@@ -37,7 +39,7 @@ def main():
     canvas = create_blank_canvas(width, height)
     
     
-     # Variáveis para o lápis
+    # Variáveis para o lápis
     last_centroid = None  # Ponto anterior (para desenhar linhas)
     pencil_color = (0, 0, 255)  # Cor do lápis (vermelho)
     pencil_thickness = 5  # Espessura da linha
