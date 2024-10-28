@@ -14,8 +14,11 @@ def parseArguments():
 
     parser.add_argument('-j', '--json', dest='path', type=str,required=True,
                         help='Full path to the json file')
+    
+    parser.add_argument('-sp', '--shakep', dest='shake', default=False, type=bool, required=False,
+                        help='Usar Shake Prevenction')
 
     
     args = parser.parse_args()
 
-    return args.path
+    return args.path, args.shake
