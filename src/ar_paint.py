@@ -74,8 +74,9 @@ def main():
         
 
         # Mostra a tela de desenho (por enquanto vazia) e a captura de vídeo
-        cv2.imshow("Canvas", canvas)
-        cv2.imshow("Camera", frame)
+        #cv2.imshow("Canvas", canvas)
+        #cv2.imshow("Camera", frame)
+        cv2.imshow("Canvas and Camera", np.hstack((cv2.resize(cv2.flip(canvas, 1), (640, 540)), cv2.resize(cv2.flip(frame, 1), (640, 540)))))
 
         k = cv2.waitKey(1)
         # Teclas de controle
@@ -96,7 +97,7 @@ def main():
             now = datetime.now()
             formatted_time = now.strftime("drawing_%a_%b_%d_%H:%M:%S_%Y.png")
             
-            # Salvar a imagem (tela) com o nome formatado
+            # Salvar a imagem da tela com o nome formatado
             cv2.imwrite(formatted_time, canvas)
             print(f"Imagem salva como {formatted_time}")
         elif k == ord("q"):
