@@ -8,6 +8,7 @@ import cv2
 import json
 import math
 import numpy as np
+import time
 from utils.argumentParser import parseArguments
 from utils.functions import *
 from datetime import datetime
@@ -73,30 +74,36 @@ def main():
                 last_centroid = centroid
         
 
-        # Mostra a tela de desenho (por enquanto vazia) e a captura de vídeo
-        #cv2.imshow("Canvas", canvas)
-        #cv2.imshow("Camera", frame)
-        cv2.imshow("Canvas and Camera", np.hstack((cv2.resize(cv2.flip(canvas, 1), (640, 540)), cv2.resize(cv2.flip(frame, 1), (640, 540)))))
+        # Mostra a tela e a captura de vídeo sobrepostas
+        canvas_frame = cv2.addWeighted(frame, 0.4, canvas, 1 - 0.4, 0)
+        cv2.imshow("Video e tela sobrepostos", cv2.flip(canvas_frame, 1))
+        # Mostra a tela de desenho (por enquanto vazia) e a captura de vídeo na mesma janela
+        #cv2.imshow("Canvas and Camera", np.hstack((cv2.resize(cv2.flip(canvas, 1), (640, 540)), cv2.resize(cv2.flip(frame, 1), (640, 540)))))
 
-        k = cv2.waitKey(1)
+        k = cv2.waitKey(1)        
+
         # Teclas de controle
-        
         if k == ord("r"):
             pencil_color = (0,0,255)
+            print("Lápis vermelho")
         elif k == ord("g"):
             pencil_color = (0,255,0)
+            print("Lápis verde")
         elif k == ord("b"):
             pencil_color = (255,0,0)
+            print("Lápis azul")
         elif k == ord("+"):
             pencil_thickness += 1
+            print("Tamanho do lápis:", pencil_thickness)
         elif k == ord("-"):
             pencil_thickness = max(pencil_thickness - 1,1)
+            print("Tamanho do lápis:", pencil_thickness)
         elif k == ord("c"):
             canvas.fill(255)
+            print("Tela limpa")
         elif k == ord("w"):
             now = datetime.now()
             formatted_time = now.strftime("drawing_%a_%b_%d_%H:%M:%S_%Y.png")
-            
             # Salvar a imagem da tela com o nome formatado
             cv2.imwrite(formatted_time, canvas)
             print(f"Imagem salva como {formatted_time}")

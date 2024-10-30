@@ -10,7 +10,7 @@ def save(event,x,y,flags,param):
 
 def onTrackbar(threshold, mm, C,limits):
     limits[C][mm] = threshold
-
+    
 
 def main():
     window_name = "Video"
