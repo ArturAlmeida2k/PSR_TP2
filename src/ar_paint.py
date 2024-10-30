@@ -8,7 +8,6 @@ import cv2
 import json
 import math
 import numpy as np
-import time
 from utils.argumentParser import parseArguments
 from utils.functions import *
 from datetime import datetime
@@ -49,7 +48,9 @@ def main():
         ret, frame = cap.read()
         if not ret:
             break
-    
+            
+        originalframe = frame.copy()
+
         mask = cv2.inRange(frame,(limits["B"]["min"],limits["G"]["min"],limits["R"]["min"]),(limits["B"]["max"],limits["G"]["max"],limits["R"]["max"]))       
 
         largest_contour = get_largest_contour(mask)
@@ -75,10 +76,14 @@ def main():
         
 
         # Mostra a tela e a captura de vídeo sobrepostas
-        canvas_frame = cv2.addWeighted(frame, 0.4, canvas, 1 - 0.4, 0)
-        cv2.imshow("Video e tela sobrepostos", cv2.flip(canvas_frame, 1))
+        if videocanva:
+            canvas[np.all(canvas == [255, 255, 255], axis=-1)] = [0, 0, 0]
+            
+            canvas_frame = cv2.add(originalframe, canvas)
+            cv2.imshow("Canvas and Camera", np.concatenate([cv2.flip(canvas_frame,1),cv2.flip(frame,1)], axis=1))
         # Mostra a tela de desenho (por enquanto vazia) e a captura de vídeo na mesma janela
-        #cv2.imshow("Canvas and Camera", np.hstack((cv2.resize(cv2.flip(canvas, 1), (640, 540)), cv2.resize(cv2.flip(frame, 1), (640, 540)))))
+        else:
+            cv2.imshow("Canvas and Camera", np.concatenate([cv2.flip(canvas,1),cv2.flip(frame,1)], axis=1))
 
         k = cv2.waitKey(1)        
 
@@ -120,7 +125,7 @@ def main():
 if __name__ == '__main__':
 
     #  Retrieve all the arguments
-    path, shake = parseArguments()
+    path, shake, videocanva = parseArguments()
 
     #  Call the main code
     main()
