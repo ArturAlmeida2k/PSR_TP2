@@ -8,7 +8,6 @@ import cv2
 import json
 import math
 import numpy as np
-import keyboard
 from utils.argumentParser import parseArguments
 from utils.functions import *
 from datetime import datetime
@@ -137,12 +136,6 @@ def main():
         elif k == ord("s"):
             pressing_s = True
             print("here here")
-            while True:
-                if keyboard.is_pressed("s"):
-                    print("still here")
-                if not keyboard.is_pressed("s"):
-                    break
-            pass
         elif k == ord("o"):
             pass
         elif k == ord("e"):
