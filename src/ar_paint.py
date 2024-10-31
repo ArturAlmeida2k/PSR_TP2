@@ -93,9 +93,21 @@ def main():
         if videocanva:
             
             canvas_frame = video_canvas(canvas, originalframe)
+            # Tornar o background do canvas preto para poder fazer cv2.add() 
+            canvas[np.all(canvas == [255, 255, 255], axis=-1)] = [0, 0, 0]
+            
+            # Armazenar onde exitem a cor vermelha|verde|azul para quando se juntar a frame não somar valores aos 0's
+            red_mask = np.all(canvas == [0, 0, 255], axis=-1)
+            green_mask = np.all(canvas == [0, 255, 0], axis=-1)
+            blue_mask = np.all(canvas == [255, 0, 0], axis=-1)
+            color_mask = red_mask | green_mask | blue_mask
+            
+            canvas_frame = np.where(color_mask[..., None], canvas, cv2.add(originalframe, canvas))
 
             # Mostra a tela de desenho com a frame como background e a captura de vídeo na mesma janela
-            cv2.imshow("Canvas and Camera", np.concatenate([cv2.flip(canvas_frame,1),cv2.flip(frame,1)], axis=1))
+            #cv2.imshow("Canvas and Camera", np.concatenate([cv2.flip(canvas_frame,1),cv2.flip(frame,1)], axis=1))
+            cv2.imshow("Canvas and Camera", cv2.flip(canvas_frame, 1))
+
         else:
             # Mostra a tela de desenho (por enquanto vazia) e a captura de vídeo na mesma janela
             cv2.imshow("Canvas and Camera", np.concatenate([cv2.flip(canvas,1),cv2.flip(frame,1)], axis=1))
