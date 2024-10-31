@@ -8,9 +8,11 @@ import cv2
 import json
 import math
 import numpy as np
+import keyboard
 from utils.argumentParser import parseArguments
 from utils.functions import *
 from datetime import datetime
+
 
 
 #  ------------------------------
@@ -43,6 +45,7 @@ def main():
     pencil_color = (0, 0, 255)  # Cor do lápis (vermelho)
     pencil_thickness = 5  # Espessura da linha
 
+    pressing_s = False
 
     while True:
         ret, frame = cap.read()
@@ -66,27 +69,31 @@ def main():
                                markerSize=20, thickness=2)
                 
                 # 5. Usar o centroide para desenhar na tela (canvas)
-                if (last_centroid is not None and not shake) or (last_centroid is not None and math.sqrt(abs((last_centroid[0]-centroid[0])**2+(last_centroid[1]-centroid[1])**2)) < 50 and shake):
+                if not shake and last_centroid is not None:
                     
                     # Desenhar uma linha da última posição para a nova
                     cv2.line(canvas, last_centroid, centroid, pencil_color, pencil_thickness)
-                
+
+                elif shake and last_centroid is not None:
+                    # Calcular a distancia entre o centro atual e o anterior e definir a distancia maxima.
+                    distance = math.sqrt(abs((last_centroid[0]-centroid[0])**2+(last_centroid[1]-centroid[1])**2))
+                    maximum_distance = 50
+
+                    if distance <= maximum_distance: 
+                        # Desenhar uma linha da última posição para a nova
+                          cv2.line(canvas, last_centroid, centroid, pencil_color, pencil_thickness)
+                    else:
+                        # Desenhar um ponto no centro atual
+                        cv2.line(canvas, centroid, centroid, pencil_color, pencil_thickness)
+
                 # Atualizar a última posição
                 last_centroid = centroid
         
 
         # Mostra a tela e a captura de vídeo sobrepostas
         if videocanva:
-            # Tonar o background do canvas preto para poder fazer cv2.add() 
-            canvas[np.all(canvas == [255, 255, 255], axis=-1)] = [0, 0, 0]
             
-            # Armazenar onde exitem a cor vermelha|verde|azul para quando se juntar a frame não somar valores aos 0's
-            red_mask = np.all(canvas == [0, 0, 255], axis=-1)
-            green_mask = np.all(canvas == [0, 255, 0], axis=-1)
-            blue_mask = np.all(canvas == [255, 0, 0], axis=-1)
-            color_mask = red_mask | green_mask | blue_mask
-            
-            canvas_frame = np.where(color_mask[..., None], canvas, cv2.add(originalframe, canvas))
+            canvas_frame = video_canvas(canvas, originalframe)
 
             # Mostra a tela de desenho com a frame como background e a captura de vídeo na mesma janela
             cv2.imshow("Canvas and Camera", np.concatenate([cv2.flip(canvas_frame,1),cv2.flip(frame,1)], axis=1))
@@ -95,6 +102,12 @@ def main():
             cv2.imshow("Canvas and Camera", np.concatenate([cv2.flip(canvas,1),cv2.flip(frame,1)], axis=1))
 
         k = cv2.waitKey(1)        
+
+
+        if pressing_s and k != ord("s"):
+            print(k)
+            print("here")
+            pressing_s = False
 
         # Teclas de controle
         if k == ord("r"):
@@ -119,8 +132,21 @@ def main():
             now = datetime.now()
             formatted_time = now.strftime("drawing_%a_%b_%d_%H:%M:%S_%Y.png")
             # Salvar a imagem da tela com o nome formatado
-            cv2.imwrite(formatted_time, canvas)
+            cv2.imwrite(formatted_time, cv2.flip(canvas, 1))
             print(f"Imagem salva como {formatted_time}")
+        elif k == ord("s"):
+            pressing_s = True
+            print("here here")
+            while True:
+                if keyboard.is_pressed("s"):
+                    print("still here")
+                if not keyboard.is_pressed("s"):
+                    break
+            pass
+        elif k == ord("o"):
+            pass
+        elif k == ord("e"):
+            pass
         elif k == ord("q"):
             cap.release()
             cv2.destroyAllWindows()

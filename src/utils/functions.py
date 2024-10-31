@@ -53,3 +53,20 @@ def get_centroid(contour):
     cy = int(M["m01"] / M["m00"])
     
     return (cx, cy)
+
+def video_canvas(canvas, frame):
+    # Tonar o background do canvas preto para poder fazer cv2.add() 
+    canvas[np.all(canvas == [255, 255, 255], axis=-1)] = [0, 0, 0]
+    
+    # Armazenar onde exitem a cor vermelha|verde|azul para quando se juntar a frame não somar valores aos 0's
+    red_mask = np.all(canvas == [0, 0, 255], axis=-1)
+    green_mask = np.all(canvas == [0, 255, 0], axis=-1)
+    blue_mask = np.all(canvas == [255, 0, 0], axis=-1)
+    color_mask = red_mask | green_mask | blue_mask
+    
+    canvas_frame = np.where(color_mask[..., None], canvas, cv2.add(frame, canvas))
+    return canvas_frame
+
+def canvas_figure_square(canvas, figure, centroid):
+    pass
+    
