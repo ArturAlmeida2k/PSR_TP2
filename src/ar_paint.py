@@ -77,7 +77,7 @@ def main():
                 elif shake and last_centroid is not None:
                     # Calcular a distancia entre o centro atual e o anterior e definir a distancia maxima.
                     distance = math.sqrt(abs((last_centroid[0]-centroid[0])**2+(last_centroid[1]-centroid[1])**2))
-                    maximum_distance = 50
+                    maximum_distance = 75
 
                     if distance <= maximum_distance: 
                         # Desenhar uma linha da última posição para a nova
@@ -112,10 +112,41 @@ def main():
             # Mostra a tela de desenho vazia e a captura de vídeo na mesma janela
             cv2.imshow("Canvas and Camera", np.concatenate([cv2.flip(canvas,1),cv2.flip(frame,1)], axis=1))
 
-        k = cv2.waitKey(1)        
+        k = cv2.waitKey(1)
+
+        # Obter o objeto
+        image_grey = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        _, thresh = cv2.threshold(image_grey, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(thresh, 4, cv2.CV_32S)
+
+        if coloringimage:
+            image, labelColors, labelMatrix = load_image(height, width)
+            cv2.imshow("Imagem para colorir", cv2.subtract(np.ones((height, width, 3)) * 255, image, dtype=cv2.CV_64F))
+            
+            redline=""
+            greenline=""
+            blueline=""
+            for i in range(len(labelColors)):
+                if labelColors[i] == (0,0,255):
+                    redline += str(i) + ", "
+                elif labelColors[i] == (0,255,0):
+                    greenline += str(i) + ", "
+                elif labelColors[i] == (255,0,0):
+                    blueline+= str(i) + ", "
+            print(Style.BRIGHT + "Cores para pintar a imagem:" + Style.RESET_ALL)
+            print(Fore.RED + "Vermelho: " + Style.RESET_ALL + redline[:-2])
+            print(Fore.GREEN + "Verde: " + Style.RESET_ALL + greenline[:-2])
+            print(Fore.BLUE + "Azul: " + Style.RESET_ALL + blueline[:-2])
+
+        if num_labels > 1:
+            # Obter o centro do espaço de maior área
+            max_area_label = sorted([(i, stats[i, cv2.CC_STAT_AREA]) for i in range(num_labels)], key=lambda x: x[1])[-2][0]
+            maskci = cv2.inRange(labels, max_area_label, max_area_label)
+            maskci = maskci.astype(bool)
+            frame[maskci] = (0, 255, 0)
 
 
-        if pressing_s and (k != ord("s") or k == ord("S")):
+        if pressing_s and (k != ord("s") or k != ord("S")):
             print(k)
             print("here")
             pressing_s = False
@@ -165,8 +196,6 @@ def main():
 if __name__ == '__main__':
 
     # Ir buscar todos os argumentos
-    path, shake, videocanva = parseArguments()
+    path, shake, videocanva, coloringimage = parseArguments()
     
     main()
-
-

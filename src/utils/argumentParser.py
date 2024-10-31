@@ -19,8 +19,10 @@ def parseArguments():
                         help='Usar Shake Prevenction')
     parser.add_argument('-vc','--videocanva', dest='videocanva', default=False, type=bool, required=False,
                         help='Usar captura como canvas')
+    parser.add_argument('-ci', '--coloringimage', dest= 'coloringimage', default=False, type=bool, required=False,
+                        help='Usar imagem para pintar')
 
 
     args = parser.parse_args()
 
-    return args.path, args.shake, args.videocanva
+    return args.path, args.shake, args.videocanva, args.coloringimage
