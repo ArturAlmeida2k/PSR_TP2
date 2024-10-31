@@ -9,53 +9,54 @@ import numpy as np
 #  ------------------------------
 #  -----  Helper Functions  -----
 #  ------------------------------
-    #Start video captue
+
+# Captação de vídeo
 def start_video_capture():
 
     cap = cv2.VideoCapture(0)  
     
-    # Verify if the camera has been open correctly
+    # Verificar se a câmara abriu corretamente
     if not cap.isOpened():
         print("Erro: Não foi possível abrir a câmara.")
         exit()
 
     return cap
 
-    #Create a blank canvas with the same size as the video capture
+# Criar uma tela em branco com o mesmo tamanho da captação de vídeo
 def create_blank_canvas(width, height):
 
     canvas = np.ones(shape=[height, width, 3], dtype=np.uint8) 
     canvas.fill(255)
     return canvas
 
-    # Find largest contour in the mask
+# Encontrar a maior máscara
 def get_largest_contour(mask):
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     
-    # If not contour is found .i.e the mask if full black
+    # Caso não encontre nenhum contorno (ex.: a máscara ser toda preta)
     if len(contours) == 0:
         return None
     
-    # Find largest countour
+    # Encontrar a maior máscara
     largest_contour = max(contours, key=cv2.contourArea)
     
     return largest_contour
 
-    # Find the centroid of the contour
+# Encontrar o centro da máscara
 def get_centroid(contour):
     M = cv2.moments(contour)
     
     if M["m00"] == 0:  
         return None
     
-    # Calculate centroid
+    # Calcular o centro
     cx = int(M["m10"] / M["m00"])
     cy = int(M["m01"] / M["m00"])
     
     return (cx, cy)
 
 def video_canvas(canvas, frame):
-    # Tonar o background do canvas preto para poder fazer cv2.add() 
+    # Tornar o background do canvas preto para poder fazer cv2.add() 
     canvas[np.all(canvas == [255, 255, 255], axis=-1)] = [0, 0, 0]
     
     # Armazenar onde exitem a cor vermelha|verde|azul para quando se juntar a frame não somar valores aos 0's

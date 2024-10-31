@@ -17,8 +17,7 @@ def main():
     cv2.namedWindow(window_name)
     capture = cv2.VideoCapture(0)
     limits = {"B": {"max": 255, "min": 0},"G": {"max": 255, "min": 0},"R": {"max": 255, "min": 0}}
-    ret, frame = capture.read() 
-    #cv2.imshow(window_name,frame)
+    ret, frame = capture.read()
     cv2.createTrackbar("B-min",window_name,limits["B"]["min"],255,lambda threshold: onTrackbar(threshold, mm="min", C="B",limits=limits))
     cv2.createTrackbar("B-max",window_name,limits["B"]["max"],255,lambda threshold: onTrackbar(threshold, mm="max", C="B",limits=limits))
     cv2.createTrackbar("G-min",window_name,limits["G"]["min"],255,lambda threshold: onTrackbar(threshold, mm="min", C="G",limits=limits))
@@ -35,9 +34,9 @@ def main():
 
         k = cv2.waitKey(1)
 
-        if k == ord("q"):
+        if k == ord("q") or k == ord("Q"):
             break
-        elif k == ord("w"):
+        elif k == ord("w") or k == ord("W"):
             file_name = 'limits.json'
             with open(file_name, 'w') as json_file:
                 print('writing dictionary d to file ' + file_name)

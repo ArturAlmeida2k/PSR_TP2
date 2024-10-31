@@ -8,6 +8,7 @@ import cv2
 import json
 import math
 import numpy as np
+from colorama import Style, Fore
 from utils.argumentParser import parseArguments
 from utils.functions import *
 from datetime import datetime
@@ -17,7 +18,7 @@ from datetime import datetime
 #  ------------------------------
 #  -----     Variables      -----
 #  ------------------------------
-global path, shake
+global path, shake, videocanva
 
 
 #  ------------------------------
@@ -30,7 +31,7 @@ def main():
     with open(path,"r") as json_file:
         limits = json.load(json_file)["limits"]
 
-    # Iniciar a captura da câmara
+    # Iniciar captura de vídeo
     cap = start_video_capture()
 
     ret, frame = cap.read()
@@ -41,7 +42,7 @@ def main():
     
     # Variáveis para o lápis
     last_centroid = None  # Ponto anterior (para desenhar linhas)
-    pencil_color = (0, 0, 255)  # Cor do lápis (vermelho)
+    pencil_color = (0, 0, 255)  # Cor do lápis a vermelho
     pencil_thickness = 5  # Espessura da linha
 
     pressing_s = False
@@ -60,14 +61,14 @@ def main():
             # Destacar o objeto de maior área pintando-o de verde
             cv2.drawContours(frame, [largest_contour], -1, (0, 255, 0), 2)
             
-            # 4. Calcular o centróide do objeto
+            # Calcular o centróide do objeto
             centroid = get_centroid(largest_contour)
             if centroid is not None:
                 # Desenhar uma cruz vermelha no centróide
                 cv2.drawMarker(frame, centroid, (0, 0, 255), markerType=cv2.MARKER_CROSS, 
                                markerSize=20, thickness=2)
                 
-                # 5. Usar o centroide para desenhar na tela (canvas)
+                # Usar o centroide para desenhar na tela
                 if not shake and last_centroid is not None:
                     
                     # Desenhar uma linha da última posição para a nova
@@ -91,7 +92,7 @@ def main():
 
         # Mostra a tela e a captura de vídeo sobrepostas
         if videocanva:
-            
+
             canvas_frame = video_canvas(canvas, originalframe)
             # Tornar o background do canvas preto para poder fazer cv2.add() 
             canvas[np.all(canvas == [255, 255, 255], axis=-1)] = [0, 0, 0]
@@ -105,54 +106,53 @@ def main():
             canvas_frame = np.where(color_mask[..., None], canvas, cv2.add(originalframe, canvas))
 
             # Mostra a tela de desenho com a frame como background e a captura de vídeo na mesma janela
-            #cv2.imshow("Canvas and Camera", np.concatenate([cv2.flip(canvas_frame,1),cv2.flip(frame,1)], axis=1))
-            cv2.imshow("Canvas and Camera", cv2.flip(canvas_frame, 1))
+            cv2.imshow("Canvas and Camera", np.concatenate([cv2.flip(canvas_frame,1),cv2.flip(frame,1)], axis=1))
 
         else:
-            # Mostra a tela de desenho (por enquanto vazia) e a captura de vídeo na mesma janela
+            # Mostra a tela de desenho vazia e a captura de vídeo na mesma janela
             cv2.imshow("Canvas and Camera", np.concatenate([cv2.flip(canvas,1),cv2.flip(frame,1)], axis=1))
 
         k = cv2.waitKey(1)        
 
 
-        if pressing_s and k != ord("s"):
+        if pressing_s and (k != ord("s") or k == ord("S")):
             print(k)
             print("here")
             pressing_s = False
 
         # Teclas de controle
-        if k == ord("r"):
+        if k == ord("r") or k == ord("R"):
             pencil_color = (0,0,255)
-            print("Lápis vermelho")
-        elif k == ord("g"):
+            print("Lápis", Fore.RED + "vermelho" + Style.RESET_ALL)
+        elif k == ord("g") or k == ord("G"):
             pencil_color = (0,255,0)
-            print("Lápis verde")
-        elif k == ord("b"):
+            print("Lápis", Fore.GREEN + "verde" + Style.RESET_ALL)
+        elif k == ord("b") or k == ord("B"):
             pencil_color = (255,0,0)
-            print("Lápis azul")
+            print("Lápis", Fore.BLUE + "azul" + Style.RESET_ALL)
         elif k == ord("+"):
             pencil_thickness += 1
             print("Tamanho do lápis:", pencil_thickness)
         elif k == ord("-"):
             pencil_thickness = max(pencil_thickness - 1,1)
             print("Tamanho do lápis:", pencil_thickness)
-        elif k == ord("c"):
+        elif k == ord("c") or k == ord("C"):
             canvas.fill(255)
             print("Tela limpa")
-        elif k == ord("w"):
+        elif k == ord("w") or k == ord("W"):
             now = datetime.now()
             formatted_time = now.strftime("drawing_%a_%b_%d_%H:%M:%S_%Y.png")
             # Salvar a imagem da tela com o nome formatado
             cv2.imwrite(formatted_time, cv2.flip(canvas, 1))
             print(f"Imagem salva como {formatted_time}")
-        elif k == ord("s"):
+        elif k == ord("s") or k == ord("S"):
             pressing_s = True
             print("here here")
-        elif k == ord("o"):
+        elif k == ord("o") or k == ord("O"):
             pass
-        elif k == ord("e"):
+        elif k == ord("e") or k == ord("E"):
             pass
-        elif k == ord("q"):
+        elif k == ord("q") or k == ord("Q"):
             cap.release()
             cv2.destroyAllWindows()
             break
@@ -164,10 +164,9 @@ def main():
 #  ------------------------------
 if __name__ == '__main__':
 
-    #  Retrieve all the arguments
+    # Ir buscar todos os argumentos
     path, shake, videocanva = parseArguments()
-
-    #  Call the main code
+    
     main()
 
 
