@@ -11,7 +11,7 @@ import random
 #  -----  Helper Functions  -----
 #  ------------------------------
 
-# Captação de vídeo
+# Captura de vídeo
 def start_video_capture():
 
     cap = cv2.VideoCapture(0)  
@@ -23,7 +23,7 @@ def start_video_capture():
 
     return cap
 
-# Criar uma tela em branco com o mesmo tamanho da captação de vídeo
+# Criar uma tela em branco com o mesmo tamanho da captura de vídeo
 def create_blank_canvas(width, height):
 
     canvas = np.ones(shape=[height, width, 3], dtype=np.uint8) 
