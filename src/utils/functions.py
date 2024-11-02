@@ -75,7 +75,7 @@ def canvas_figure_square(canvas, figure, centroid):
     pass
 
 # Importar uma imagem para colorir
-def load_image(height, width):
+'''def load_image(height, width):
     image = cv2.imread("./img/flor.png", cv2.IMREAD_GRAYSCALE)
 
     image = cv2.resize(image, (int(image.shape[1] * height / image.shape[0]), height))
@@ -116,3 +116,39 @@ def load_image(height, width):
     image = cv2.bitwise_not(image)
 
     return cv2.cvtColor(image, cv2.COLOR_GRAY2RGB), labelColors, labels
+'''
+
+
+def numerar_flor(imagem_path):
+    # Carregar a imagem e converter para escala de cinza
+    image = cv2.cvtColor(cv2.imread(imagem_path), cv2.COLOR_BGR2GRAY)
+
+    if image is None:
+        print(
+            f"Erro: Não foi possível carregar a imagem a partir de '{imagem_path}'")
+        return None
+
+    # Aplicar threshold para criar uma imagem binária
+    _, thresh = cv2.threshold(image, 240, 255, cv2.THRESH_BINARY_INV)
+
+    # Detectar contornos
+    contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    # Encontrar a área dos contornos para diferenciar o centro das pétalas
+    areas = [cv2.contourArea(contour) for contour in contours]
+    min_area = min(areas)
+
+    # Numerar o centro como "1" e as pétalas como "2"
+    for c in contours:
+        m = cv2.moments(c)
+        if m["m00"] != 0:
+            cx = int(m["m10"] / m["m00"])
+            cy = int(m["m01"] / m["m00"])
+
+            # Verificar se o contorno é o centro ou uma pétala com base na área
+            if cv2.contourArea(c) == min_area:
+                cv2.putText(image, "1", (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+            else:
+                cv2.putText(image, "2", (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+
+    return image

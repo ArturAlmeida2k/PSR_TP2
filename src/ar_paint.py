@@ -51,6 +51,9 @@ def main():
     pressing = False
     let_go_sum = 0
 
+    imagem_numerada = numerar_flor('img/flor.png')
+    cv2.imshow("Flor Numerada", imagem_numerada)
+
     while True:
         ret, frame = cap.read()
         if not ret:
@@ -126,36 +129,7 @@ def main():
 
         k = cv2.waitKey(1)
         print(k)
-        # Obter o objeto
-        image_grey = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        _, thresh = cv2.threshold(image_grey, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-        num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(thresh, 4, cv2.CV_32S)
 
-        if coloringimage:
-            image, labelColors, labelMatrix = load_image(height, width)
-            cv2.imshow("Imagem para colorir", cv2.subtract(np.ones((height, width, 3)) * 255, image, dtype=cv2.CV_64F))
-            
-            redline=""
-            greenline=""
-            blueline=""
-            for i in range(len(labelColors)):
-                if labelColors[i] == (0,0,255):
-                    redline += str(i) + ", "
-                elif labelColors[i] == (0,255,0):
-                    greenline += str(i) + ", "
-                elif labelColors[i] == (255,0,0):
-                    blueline+= str(i) + ", "
-            print(Style.BRIGHT + "Cores para pintar a imagem:" + Style.RESET_ALL)
-            print(Fore.RED + "Vermelho: " + Style.RESET_ALL + redline[:-2])
-            print(Fore.GREEN + "Verde: " + Style.RESET_ALL + greenline[:-2])
-            print(Fore.BLUE + "Azul: " + Style.RESET_ALL + blueline[:-2])
-
-        if num_labels > 1:
-            # Obter o centro do espaço de maior área
-            max_area_label = sorted([(i, stats[i, cv2.CC_STAT_AREA]) for i in range(num_labels)], key=lambda x: x[1])[-2][0]
-            maskci = cv2.inRange(labels, max_area_label, max_area_label)
-            maskci = maskci.astype(bool)
-            frame[maskci] = (0, 255, 0)
 
         if pressing_s and not (k == ord("s") or k == ord("S")):
             #print(let_go_sum)

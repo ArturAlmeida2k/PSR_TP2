@@ -4,7 +4,7 @@
 import cv2
 import json
 
-def save(event,x,y,flags,param):
+def save(event,x,y):
     if event == cv2.EVENT_LBUTTONDOWN:
         print(x,y)
 

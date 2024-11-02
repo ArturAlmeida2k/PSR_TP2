@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="36f5a392-3d35-442e-8696-dc59689bae89" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/drawing_qua_out_30_23:37:01_2024.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/drawing_qua_out_30_23:38:25_2024.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/drawing_qua_out_30_23:38:52_2024.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ar_paint.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ar_paint.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/argumentParser.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/argumentParser.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/functions.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FormatOnSaveOptions">
+    <option name="myRunOnSave" value="true" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="OptimizeOnSaveOptions">
+    <option name="myRunOnSave" value="true" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 4
+}]]></component>
+  <component name="ProjectId" id="2oIwR1CC3qQcxmoIuJyhvDlz1mL" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.ar_paint.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "fa4",
+    "settings.editor.selected.configurable": "proofread"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-d7ad00fb9fc3-c546a90a8094-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-242.23726.102" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="36f5a392-3d35-442e-8696-dc59689bae89" name="Changes" comment="" />
+      <created>1730570386308</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1730570386308</updated>
+    </task>
+    <servers />
+  </component>
+</project>
