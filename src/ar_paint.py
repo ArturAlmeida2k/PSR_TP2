@@ -46,6 +46,10 @@ def main():
     pencil_thickness = 5  # Espessura da linha
 
     pressing_s = False
+    pressing_o = False
+    pressing_e = False
+    pressing = False
+    let_go_sum = 0
 
     while True:
         ret, frame = cap.read()
@@ -68,52 +72,60 @@ def main():
                 cv2.drawMarker(frame, centroid, (0, 0, 255), markerType=cv2.MARKER_CROSS, 
                                markerSize=20, thickness=2)
                 
-                # Usar o centroide para desenhar na tela
-                if not shake and last_centroid is not None:
-                    
-                    # Desenhar uma linha da última posição para a nova
-                    cv2.line(canvas, last_centroid, centroid, pencil_color, pencil_thickness)
-
-                elif shake and last_centroid is not None:
-                    # Calcular a distancia entre o centro atual e o anterior e definir a distancia maxima.
-                    distance = math.sqrt(abs((last_centroid[0]-centroid[0])**2+(last_centroid[1]-centroid[1])**2))
-                    maximum_distance = 75
-
-                    if distance <= maximum_distance: 
+                if not pressing:
+                    # Usar o centroide para desenhar na tela
+                    if not shake and last_centroid is not None:
+                        
                         # Desenhar uma linha da última posição para a nova
-                          cv2.line(canvas, last_centroid, centroid, pencil_color, pencil_thickness)
-                    else:
-                        # Desenhar um ponto no centro atual
-                        cv2.line(canvas, centroid, centroid, pencil_color, pencil_thickness)
+                        cv2.line(canvas, last_centroid, centroid, pencil_color, pencil_thickness)
+
+                    elif shake and last_centroid is not None:
+                        # Calcular a distancia entre o centro atual e o anterior e definir a distancia maxima.
+                        distance = math.sqrt(abs((last_centroid[0]-centroid[0])**2+(last_centroid[1]-centroid[1])**2))
+                        maximum_distance = 75
+
+                        if distance <= maximum_distance: 
+                            # Desenhar uma linha da última posição para a nova
+                            cv2.line(canvas, last_centroid, centroid, pencil_color, pencil_thickness)
+                        else:
+                            # Desenhar um ponto no centro atual
+                            cv2.line(canvas, centroid, centroid, pencil_color, pencil_thickness)
+
+                else:
+                    if pressing_s:
+                        temp_canvas = canvas.copy()
+                        cv2.rectangle(temp_canvas, figure_initial, centroid, pencil_color, pencil_thickness)
+                    elif pressing_o:
+                        temp_canvas = canvas.copy()
+                        radius = round(math.sqrt(abs((figure_initial[0]-centroid[0])**2+(figure_initial[1]-centroid[1])**2)))
+                        cv2.circle(temp_canvas,figure_initial,radius,pencil_color,pencil_thickness)
+                    elif pressing_e:
+                        pass
 
                 # Atualizar a última posição
                 last_centroid = centroid
         
 
+        
+        if pressing:
+            show_canvas = temp_canvas.copy()
+        else:
+            show_canvas = canvas.copy()
+
         # Mostra a tela e a captura de vídeo sobrepostas
         if videocanva:
-
-            canvas_frame = video_canvas(canvas, originalframe)
-            # Tornar o background do canvas preto para poder fazer cv2.add() 
-            canvas[np.all(canvas == [255, 255, 255], axis=-1)] = [0, 0, 0]
             
-            # Armazenar onde exitem a cor vermelha|verde|azul para quando se juntar a frame não somar valores aos 0's
-            red_mask = np.all(canvas == [0, 0, 255], axis=-1)
-            green_mask = np.all(canvas == [0, 255, 0], axis=-1)
-            blue_mask = np.all(canvas == [255, 0, 0], axis=-1)
-            color_mask = red_mask | green_mask | blue_mask
-            
-            canvas_frame = np.where(color_mask[..., None], canvas, cv2.add(originalframe, canvas))
+            canvas_frame = video_canvas(show_canvas, originalframe)
 
             # Mostra a tela de desenho com a frame como background e a captura de vídeo na mesma janela
             cv2.imshow("Canvas and Camera", np.concatenate([cv2.flip(canvas_frame,1),cv2.flip(frame,1)], axis=1))
 
         else:
             # Mostra a tela de desenho vazia e a captura de vídeo na mesma janela
-            cv2.imshow("Canvas and Camera", np.concatenate([cv2.flip(canvas,1),cv2.flip(frame,1)], axis=1))
+            cv2.imshow("Canvas and Camera", np.concatenate([cv2.flip(show_canvas,1),cv2.flip(frame,1)], axis=1))
 
         k = cv2.waitKey(1)
-
+        print(k)
         # Obter o objeto
         image_grey = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         _, thresh = cv2.threshold(image_grey, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
@@ -145,11 +157,28 @@ def main():
             maskci = maskci.astype(bool)
             frame[maskci] = (0, 255, 0)
 
-
-        if pressing_s and (k != ord("s") or k != ord("S")):
-            print(k)
-            print("here")
-            pressing_s = False
+        if pressing_s and not (k == ord("s") or k == ord("S")):
+            #print(let_go_sum)
+            let_go_sum += 1
+            if let_go_sum >= 10:
+                pressing_s = False
+                pressing = False
+                canvas = temp_canvas.copy()
+                let_go_sum = 0
+        elif pressing_s:
+            let_go_sum = 0
+        
+        if pressing_o and not (k == ord("o") or k == ord("O")):
+            let_go_sum += 1
+            if let_go_sum >= 10:
+                pressing_o = False
+                pressing = False
+                canvas = temp_canvas.copy()
+                let_go_sum = 0
+        elif pressing_o:
+            let_go_sum = 0
+        
+        
 
         # Teclas de controle
         if k == ord("r") or k == ord("R"):
@@ -176,12 +205,15 @@ def main():
             # Salvar a imagem da tela com o nome formatado
             cv2.imwrite(formatted_time, cv2.flip(canvas, 1))
             print(f"Imagem salva como {formatted_time}")
-        elif k == ord("s") or k == ord("S"):
+        elif (k == ord("s") or k == ord("S")) and not pressing:
             pressing_s = True
-            print("here here")
-        elif k == ord("o") or k == ord("O"):
-            pass
-        elif k == ord("e") or k == ord("E"):
+            pressing = True
+            figure_initial = centroid
+        elif (k == ord("o") or k == ord("O")) and not pressing:
+            pressing_o = True
+            pressing = True
+            figure_initial = centroid
+        elif k == ord("e") or k == ord("E") and not pressing:
             pass
         elif k == ord("q") or k == ord("Q"):
             cap.release()
