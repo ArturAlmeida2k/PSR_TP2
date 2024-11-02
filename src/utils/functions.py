@@ -70,9 +70,6 @@ def video_canvas(canvas, frame):
     canvas_frame = np.where(color_mask[..., None], canvas, cv2.add(frame, canvas))
     return canvas_frame
 
-# Desenhar um quadrado
-def canvas_figure_square(canvas, figure, centroid):
-    pass
 
 # Importar uma imagem para colorir
 def load_image(height, width):
