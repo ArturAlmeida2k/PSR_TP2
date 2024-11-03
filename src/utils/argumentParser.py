@@ -23,7 +23,9 @@ def parseArguments():
     parser.add_argument('-ci', '--coloringimage', dest='coloringimage', action="store_true",
                         help='Usar imagem para pintar')
 
+    parser.add_argument('-ev', '--evaluation', dest='evaluation', action="store_true",
+                        help='Fazer uma avaliação da imagem pintada')
 
     args = parser.parse_args()
 
-    return args.path, args.shake, args.videocanva, args.coloringimage
+    return args.path, args.shake, args.videocanva, args.coloringimage, args.evaluation

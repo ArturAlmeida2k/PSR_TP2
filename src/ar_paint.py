@@ -18,7 +18,7 @@ from datetime import datetime
 #  ------------------------------
 #  -----     Variables      -----
 #  ------------------------------
-global path, shake, videocanva, coloringimage
+global path, shake, videocanva, coloringimage, evaluation
 
 
 #  ------------------------------
@@ -144,33 +144,46 @@ def main():
         if k == ord("r") or k == ord("R"):
             pencil_color = (0, 0, 255)
             print("Lápis", Fore.RED + "vermelho" + Style.RESET_ALL)
+
         elif k == ord("g") or k == ord("G"):
             pencil_color = (0, 255, 0)
             print("Lápis", Fore.GREEN + "verde" + Style.RESET_ALL)
+
         elif k == ord("b") or k == ord("B"):
             pencil_color = (255, 0, 0)
             print("Lápis", Fore.BLUE + "azul" + Style.RESET_ALL)
+
         elif k == ord("+"):
             pencil_thickness += 1
             print("Tamanho do lápis:", pencil_thickness)
+
         elif k == ord("-"):
             pencil_thickness = max(pencil_thickness - 1, 1)
             print("Tamanho do lápis:", pencil_thickness)
+
         elif k == ord("c") or k == ord("C"):
             canvas.fill(255)
             print("Tela limpa")
+
         elif k == ord("w") or k == ord("W"):
             now = datetime.now()
             formatted_time = now.strftime("drawing_%a_%b_%d_%H:%M:%S_%Y.png")
             # Salvar a imagem da tela com o nome formatado
             cv2.imwrite(formatted_time, cv2.flip(canvas, 1))
             print(f"Imagem salva como {formatted_time}")
+            # Fazer a avaliação
+            if evaluation:
+                score = evaluate_painting("./drawing_Sun_Nov_03_20:54:29_2024.png") # PARA TESTAR DEPOIS POR "formatted_time"
+                print(f"Precisão da pintura: {score:.2f}%")
+
         elif (k == ord("s") or k == ord("S")) and not pressing and largest_contour is not None:
             pressing_s = True
             figure_initial = centroid
+
         elif (k == ord("o") or k == ord("O")) and not pressing and largest_contour is not None:
             pressing_o = True
             figure_initial = centroid
+
         elif k == ord("q") or k == ord("Q"):
             cap.release()
             cv2.destroyAllWindows()
@@ -185,6 +198,6 @@ def main():
 if __name__ == '__main__':
 
     # Ir buscar todos os argumentos
-    path, shake, videocanva, coloringimage = parseArguments()
+    path, shake, videocanva, coloringimage, evaluation = parseArguments()
     
     main()

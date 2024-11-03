@@ -71,7 +71,6 @@ def video_canvas(canvas, frame):
     canvas_frame = np.where(color_mask[..., None], canvas, cv2.add(frame, canvas))
     return canvas_frame
 
-
 # Importar uma imagem para colorir
 def number_image(height, width, image_path):
     image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
@@ -86,8 +85,6 @@ def number_image(height, width, image_path):
     output = cv2.connectedComponentsWithStats(image, 4, cv2.CV_32S)
 
     num_labels = output[0]  # Número da área
-    labels = output[1]      # Legenda da área
-    stats = output[2]       # Estatísticas
     centroids = output[3]   # Centro da área
 
 
@@ -123,7 +120,7 @@ def number_image(height, width, image_path):
 
     return image
 
-
+# Desenhar formas
 def handle_shapes(k, pressing_s, pressing_o, engaged, let_go_sum, canvas, temp_canvas):
     # Caso ainda não esteja a registar varios valor para k continuos para e se esteja a mostrar uma forma
     # for criada isto para dar mais tempo de espera ate que registe os valores corretos para k
@@ -163,3 +160,27 @@ def handle_shapes(k, pressing_s, pressing_o, engaged, let_go_sum, canvas, temp_c
             let_go_sum = 0
     
     return pressing_s, pressing_o, engaged, let_go_sum, canvas
+
+#
+def evaluate_painting(painted_img):
+    output = cv2.connectedComponentsWithStats(painted_img, 4, cv2.CV_32S)
+    num_labels = output[0]  # Número da área
+    labels = output[1]  # label matrix
+
+    labelColors = [None] * num_labels
+
+    hits = 0
+    misses = 0
+
+    for i in range(painted_img[1]):
+        for j in range(painted_img[1]):
+            rightColor = labelColors[labels[i, j]]
+            if rightColor != (0, 0, 0):
+                if np.array_equal(painted_img[i, j], rightColor):
+                    hits += 1
+                else:
+                    misses += 1
+
+    precision = str(round(hits / (hits + misses), 3))
+
+    return precision
