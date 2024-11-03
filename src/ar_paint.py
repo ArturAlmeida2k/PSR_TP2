@@ -51,8 +51,18 @@ def main():
     pressing = False
     let_go_sum = 0
 
-    imagem_numerada = numerar_flor('img/flor.png')
-    cv2.imshow("Flor Numerada", imagem_numerada)
+
+    # Abrir o desenho para colorir
+    if coloringimage:
+        image, labelColors, _ = load_image(height, width, "./img/flor.jpeg")
+
+        cv2.imshow("Imagem para colorir", cv2.subtract(np.ones((height, width, 3)) * 255, image, dtype=cv2.CV_64F))
+
+        print(Style.BRIGHT + "\nCores para pintar a imagem:" + Style.RESET_ALL)
+        print(Fore.WHITE + "\tCinza: " + Style.RESET_ALL + "1")
+        print(Fore.MAGENTA + "\tRosa: " + Style.RESET_ALL + "2")
+        print(Fore.YELLOW + "\tAmarelo: " + Style.RESET_ALL + "3\n")
+
 
     while True:
         ret, frame = cap.read()
@@ -61,17 +71,18 @@ def main():
             
         originalframe = frame.copy()
 
-        mask = cv2.inRange(frame,(limits["B"]["min"],limits["G"]["min"],limits["R"]["min"]),(limits["B"]["max"],limits["G"]["max"],limits["R"]["max"]))       
+        mask = cv2.inRange(frame,(limits["B"]["min"],limits["G"]["min"],limits["R"]["min"]),
+                                (limits["B"]["max"],limits["G"]["max"],limits["R"]["max"]))
 
         largest_contour = get_largest_contour(mask)
         if largest_contour is not None:
             # Destacar o objeto de maior área pintando-o de verde
             cv2.drawContours(frame, [largest_contour], -1, (0, 255, 0), 2)
             
-            # Calcular o centróide do objeto
+            # Calcular o centroide do objeto
             centroid = get_centroid(largest_contour)
             if centroid is not None:
-                # Desenhar uma cruz vermelha no centróide
+                # Desenhar uma cruz vermelha no centroide
                 cv2.drawMarker(frame, centroid, (0, 0, 255), markerType=cv2.MARKER_CROSS, 
                                markerSize=20, thickness=2)
                 
@@ -128,7 +139,6 @@ def main():
             cv2.imshow("Canvas and Camera", np.concatenate([cv2.flip(show_canvas,1),cv2.flip(frame,1)], axis=1))
 
         k = cv2.waitKey(1)
-        print(k)
 
 
         if pressing_s and not (k == ord("s") or k == ord("S")):
@@ -152,7 +162,14 @@ def main():
         elif pressing_o:
             let_go_sum = 0
         
-        
+
+        # Obter o objeto
+        image_grey = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        _, thresh = cv2.threshold(
+            image_grey, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(
+            thresh, 4, cv2.CV_32S)
+
 
         # Teclas de controle
         if k == ord("r") or k == ord("R"):
