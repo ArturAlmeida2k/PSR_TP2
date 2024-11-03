@@ -51,7 +51,17 @@ def main():
     pressing_e = False
     engaged = False
     let_go_sum = 0
-    
+
+    # Abrir o desenho para colorir
+    if coloringimage:
+        image, labelColors, _ = load_image(height, width, "./img/flor.jpeg")
+        cv2.imshow("Imagem para colorir", cv2.subtract(np.ones((height, width, 3)) * 255, image, dtype=cv2.CV_64F))
+
+        print(Style.BRIGHT + "\nCores para pintar a imagem:" + Style.RESET_ALL)
+        print(Fore.WHITE + "\tCinza: " + Style.RESET_ALL + "1")
+        print(Fore.MAGENTA + "\tRosa: " + Style.RESET_ALL + "2")
+        print(Fore.YELLOW + "\tAmarelo: " + Style.RESET_ALL + "3\n")
+
 
     while True:
         ret, frame = cap.read()
@@ -124,37 +134,8 @@ def main():
         cv2.imshow("Canvas and Camera", np.concatenate([cv2.flip(show_canvas,1),cv2.flip(frame,1)], axis=1))
 
         k = cv2.waitKey(1)
-      
-        # Obter o objeto
-        image_grey = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        _, thresh = cv2.threshold(image_grey, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-        num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(thresh, 4, cv2.CV_32S)
 
-        if coloringimage:
-            image, labelColors, labelMatrix = load_image(height, width)
-            cv2.imshow("Imagem para colorir", cv2.subtract(np.ones((height, width, 3)) * 255, image, dtype=cv2.CV_64F))
-            
-            redline=""
-            greenline=""
-            blueline=""
-            for i in range(len(labelColors)):
-                if labelColors[i] == (0,0,255):
-                    redline += str(i) + ", "
-                elif labelColors[i] == (0,255,0):
-                    greenline += str(i) + ", "
-                elif labelColors[i] == (255,0,0):
-                    blueline+= str(i) + ", "
-            print(Style.BRIGHT + "Cores para pintar a imagem:" + Style.RESET_ALL)
-            print(Fore.RED + "Vermelho: " + Style.RESET_ALL + redline[:-2])
-            print(Fore.GREEN + "Verde: " + Style.RESET_ALL + greenline[:-2])
-            print(Fore.BLUE + "Azul: " + Style.RESET_ALL + blueline[:-2])
 
-        if num_labels > 1:
-            # Obter o centro do espaço de maior área
-            max_area_label = sorted([(i, stats[i, cv2.CC_STAT_AREA]) for i in range(num_labels)], key=lambda x: x[1])[-2][0]
-            maskci = cv2.inRange(labels, max_area_label, max_area_label)
-            maskci = maskci.astype(bool)
-            frame[maskci] = (0, 255, 0)
         
         # Chama a função que toma conta das formas
         if pressing:

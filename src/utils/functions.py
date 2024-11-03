@@ -72,28 +72,26 @@ def video_canvas(canvas, frame):
 
 
 # Importar uma imagem para colorir
-def load_image(height, width):
-    image = cv2.imread("./img/flor.png", cv2.IMREAD_GRAYSCALE)
-
+def load_image(height, width, image_path):
+    image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
     image = cv2.resize(image, (int(image.shape[1] * height / image.shape[0]), height))
 
     ret, thresh = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
     image = np.zeros((height, width)).astype(np.uint8)
-
     image[:, int(width / 2 - thresh.shape[1] / 2):int(width / 2 + thresh.shape[1] / 2)] = thresh
 
     # Usar connectedComponentWithStats para encontrar os espaços em branco
-    connectivity = 4
-    output = cv2.connectedComponentsWithStats(image, connectivity, cv2.CV_32S)
+    output = cv2.connectedComponentsWithStats(image, 4, cv2.CV_32S)
 
     num_labels = output[0]  # Número da área
     labels = output[1]      # Legenda da área
     stats = output[2]       # Estatísticas
     centroids = output[3]   # Centro da área
 
+
     # Associar o número à cor
-    colors = [(0, 0, 255), (0, 255, 0), (255, 0, 0)]
+    colors = [(220, 220, 220), (255, 203, 219), (255, 255, 224)]
     labelColors = [None] * num_labels
 
     for i in range(height):
@@ -105,10 +103,31 @@ def load_image(height, width):
                     labelColors[labels[i][j]] = colors[random.randint(0,2)]
 
     # Escrever os números nos vários espaços em branco
-    fontScale = (width * height) / (800 * 800) / 2
-    for i in range(0, len(centroids)):
-        if labelColors[i] != (0, 0, 0):
-            cv2.putText(image, str(i), (int(centroids[i][0] - fontScale * 14), int(centroids[i][1] + fontScale * 14)), cv2.FONT_HERSHEY_COMPLEX_SMALL, fontScale, (0, 0, 0), 1)
+    fontScale = (width * height) / (650 * 650) / 2
+    cv2.putText(image,
+                str(1),
+                (345, 205),
+                cv2.FONT_HERSHEY_COMPLEX_SMALL,
+                fontScale,
+                (0, 0, 0),
+                1)
+    for i in range(2, len(centroids)):
+        if labelColors[i] != (0, 0, 0) and (int(centroids[i][0] - fontScale * 14), int(centroids[i][1] + fontScale * 14)) != (627, 363):
+            cv2.putText(image,
+                        str(2),
+                        (int(centroids[i][0] - fontScale * 14), int(centroids[i][1] + fontScale * 14)),
+                        cv2.FONT_HERSHEY_COMPLEX_SMALL,
+                        fontScale,
+                        (0, 0, 0),
+                        1)
+        else:
+            cv2.putText(image,
+                        str(3),
+                        (int(centroids[i][0] - fontScale * 14), int(centroids[i][1] + fontScale * 14)),
+                        cv2.FONT_HERSHEY_COMPLEX_SMALL,
+                        fontScale,
+                        (0, 0, 0),
+                        1)
 
     image = cv2.bitwise_not(image)
 
