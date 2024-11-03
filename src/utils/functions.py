@@ -90,19 +90,8 @@ def load_image(height, width, image_path):
     centroids = output[3]   # Centro da área
 
 
-    # Associar o número à cor
-    colors = [(220, 220, 220), (255, 203, 219), (255, 255, 224)]
-    labelColors = [None] * num_labels
-
-    for i in range(height):
-        for j in range(width):
-            if not labelColors[labels[i][j]]:
-                if image[i][j] == 0:
-                    labelColors[labels[i][j]] = (0, 0, 0)
-                else:
-                    labelColors[labels[i][j]] = colors[random.randint(0,2)]
-
     # Escrever os números nos vários espaços em branco
+    labelColors = [None] * num_labels
     fontScale = (width * height) / (650 * 650) / 2
     cv2.putText(image,
                 str(1),
@@ -110,7 +99,7 @@ def load_image(height, width, image_path):
                 cv2.FONT_HERSHEY_COMPLEX_SMALL,
                 fontScale,
                 (0, 0, 0),
-                1)
+                2)
     for i in range(2, len(centroids)):
         if labelColors[i] != (0, 0, 0) and (int(centroids[i][0] - fontScale * 14), int(centroids[i][1] + fontScale * 14)) != (627, 363):
             cv2.putText(image,
@@ -119,7 +108,7 @@ def load_image(height, width, image_path):
                         cv2.FONT_HERSHEY_COMPLEX_SMALL,
                         fontScale,
                         (0, 0, 0),
-                        1)
+                        2)
         else:
             cv2.putText(image,
                         str(3),
@@ -127,11 +116,11 @@ def load_image(height, width, image_path):
                         cv2.FONT_HERSHEY_COMPLEX_SMALL,
                         fontScale,
                         (0, 0, 0),
-                        1)
+                        2)
 
     image = cv2.bitwise_not(image)
 
-    return cv2.cvtColor(image, cv2.COLOR_GRAY2RGB), labelColors, labels
+    return cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
 
 
 def handle_shapes(k, pressing_s, pressing_o, engaged, let_go_sum, canvas, temp_canvas):

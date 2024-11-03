@@ -54,13 +54,13 @@ def main():
 
     # Abrir o desenho para colorir
     if coloringimage:
-        image, labelColors, _ = load_image(height, width, "./img/flor.jpeg")
-        cv2.imshow("Imagem para colorir", cv2.subtract(np.ones((height, width, 3)) * 255, image, dtype=cv2.CV_64F))
+        img = load_image(height, width, "./img/flor.jpeg")
+        cv2.imshow("Imagem para colorir", cv2.subtract(np.ones((height, width, 3)) * 255, img, dtype=cv2.CV_64F))
 
         print(Style.BRIGHT + "\nCores para pintar a imagem:" + Style.RESET_ALL)
-        print(Fore.WHITE + "\tCinza: " + Style.RESET_ALL + "1")
-        print(Fore.MAGENTA + "\tRosa: " + Style.RESET_ALL + "2")
-        print(Fore.YELLOW + "\tAmarelo: " + Style.RESET_ALL + "3\n")
+        print(Fore.GREEN + "\tVerde: " + Style.RESET_ALL + "1")
+        print(Fore.RED + "\tVermelho: " + Style.RESET_ALL + "2")
+        print(Fore.BLUE + "\tAzul: " + Style.RESET_ALL + "3\n")
 
 
     while True:
