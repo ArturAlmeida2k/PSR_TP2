@@ -4,6 +4,7 @@
 import cv2
 import numpy as np
 import random
+from colorama import Style, Fore
 
 
 
@@ -61,7 +62,7 @@ def video_canvas(canvas, frame):
     # Tornar o background do canvas preto para poder fazer cv2.add() 
     canvas[np.all(canvas == [255, 255, 255], axis=-1)] = [0, 0, 0]
     
-    # Armazenar onde exitem a cor vermelha|verde|azul para quando se juntar a frame não somar valores aos 0's
+    # Armazenar onde exite cor vermelha|verde|azul para quando se juntar o frame não somar valores aos 0's
     red_mask = np.all(canvas == [0, 0, 255], axis=-1)
     green_mask = np.all(canvas == [0, 255, 0], axis=-1)
     blue_mask = np.all(canvas == [255, 0, 0], axis=-1)
@@ -72,7 +73,7 @@ def video_canvas(canvas, frame):
 
 
 # Importar uma imagem para colorir
-def load_image(height, width, image_path):
+def number_image(height, width, image_path):
     image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
     image = cv2.resize(image, (int(image.shape[1] * height / image.shape[0]), height))
 
@@ -118,9 +119,9 @@ def load_image(height, width, image_path):
                         (0, 0, 0),
                         2)
 
-    image = cv2.bitwise_not(image)
+    image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
 
-    return cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
+    return image
 
 
 def handle_shapes(k, pressing_s, pressing_o, engaged, let_go_sum, canvas, temp_canvas):

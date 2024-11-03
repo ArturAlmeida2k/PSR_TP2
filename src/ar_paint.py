@@ -18,15 +18,13 @@ from datetime import datetime
 #  ------------------------------
 #  -----     Variables      -----
 #  ------------------------------
-global path, shake, videocanva
+global path, shake, videocanva, coloringimage
 
 
 #  ------------------------------
 #  -----     Functions      -----
 #  ------------------------------
 def main():
-    global path, shake
-    
     # Abrir o ficheiro limits.json em modo leitura
     with open(path,"r") as json_file:
         limits = json.load(json_file)["limits"]
@@ -52,54 +50,51 @@ def main():
     engaged = False
     let_go_sum = 0
 
-    # Abrir o desenho para colorir
-    if coloringimage:
-        img = load_image(height, width, "./img/flor.jpeg")
-        cv2.imshow("Imagem para colorir", cv2.subtract(np.ones((height, width, 3)) * 255, img, dtype=cv2.CV_64F))
 
+    if coloringimage:
         print(Style.BRIGHT + "\nCores para pintar a imagem:" + Style.RESET_ALL)
         print(Fore.GREEN + "\tVerde: " + Style.RESET_ALL + "1")
         print(Fore.RED + "\tVermelho: " + Style.RESET_ALL + "2")
         print(Fore.BLUE + "\tAzul: " + Style.RESET_ALL + "3\n")
+        canvas = cv2.flip(number_image(height, width, "./img/flor.jpeg"), 1)
 
 
     while True:
         ret, frame = cap.read()
         if not ret:
             break
-            
-        originalframe = frame.copy()
+
 
         pressing = pressing_e | pressing_o | pressing_s
-        
-        mask = cv2.inRange(frame,(limits["B"]["min"],limits["G"]["min"],limits["R"]["min"]),(limits["B"]["max"],limits["G"]["max"],limits["R"]["max"]))       
+        mask = cv2.inRange(frame,
+                           (limits["B"]["min"], limits["G"]["min"], limits["R"]["min"]),
+                           (limits["B"]["max"], limits["G"]["max"], limits["R"]["max"]))
 
+        # Interação com a câmara
         largest_contour = get_largest_contour(mask)
         if largest_contour is not None:
             # Destacar o objeto de maior área pintando-o de verde
             cv2.drawContours(frame, [largest_contour], -1, (0, 255, 0), 2)
             
-            # Calcular o centróide do objeto
+            # Calcular o centroide do objeto
             centroid = get_centroid(largest_contour)
             if centroid is not None:
-                # Desenhar uma cruz vermelha no centróide
-                cv2.drawMarker(frame, centroid, (0, 0, 255), markerType=cv2.MARKER_CROSS, 
-                               markerSize=20, thickness=2)
+                # Desenhar uma cruz vermelha no centroide
+                cv2.drawMarker(frame, centroid, (0, 0, 255), markerType=cv2.MARKER_CROSS, markerSize=20, thickness=2)
                 
-                # Ver se esta a ser desenhada alguma forma (quadrado ou circulo) ou não
+                # Ver se está a ser desenhada alguma forma (quadrado ou circulo)
                 if not pressing:
                     # Usar o centroide para desenhar na tela
                     if not shake and last_centroid is not None:
-                        
                         # Desenhar uma linha da última posição para a nova
                         cv2.line(canvas, last_centroid, centroid, pencil_color, pencil_thickness)
 
                     elif shake and last_centroid is not None:
-                        # Calcular a distancia entre o centro atual e o anterior e definir a distancia maxima.
+                        # Calcular a distância entre o centro atual e o anterior e definir a distância máxima.
                         distance = math.sqrt(abs((last_centroid[0]-centroid[0])**2+(last_centroid[1]-centroid[1])**2))
                         maximum_distance = 75
 
-                        if distance <= maximum_distance: 
+                        if distance <= maximum_distance:
                             # Desenhar uma linha da última posição para a nova
                             cv2.line(canvas, last_centroid, centroid, pencil_color, pencil_thickness)
                         else:
@@ -107,7 +102,7 @@ def main():
                             cv2.line(canvas, centroid, centroid, pencil_color, pencil_thickness)
 
                 else:
-                    # Criar uma tela de desenho temporaria para desenhar os varios tamanhos da forma
+                    # Criar uma tela de desenho temporária para desenhar os vários tamanhos da forma
                     temp_canvas = canvas.copy()
                     if pressing_s:
                         cv2.rectangle(temp_canvas, figure_initial, centroid, pencil_color, pencil_thickness)
@@ -117,45 +112,49 @@ def main():
 
                 # Atualizar a última posição
                 last_centroid = centroid
-        
-        # Definir qual vai ser a tela de desenho a morstrar
+
+        # Definir qual vai ser a tela de desenho a mostrar
         if pressing:
-            # Caso se esteja a criar uma forma será a tela de desenho temporaria
+            # Caso se esteja a criar uma forma será a tela de desenho temporária
             show_canvas = temp_canvas.copy()
         else:
             # Caso contrario será a normal
             show_canvas = canvas.copy()
 
-        if videocanva:
-            # Caso se esteja a usar o VideoCanvas a tela de desenho será uma variante da anterior
+
+        originalframe = frame.copy()
+        # Mostrar janelas
+        if videocanva and not coloringimage:
             show_canvas = video_canvas(show_canvas, originalframe)
+            cv2.imshow("Tela Branca", np.concatenate([cv2.flip(show_canvas, 1), cv2.flip(canvas, 1)], axis=1))
+        elif coloringimage and not videocanva:
+            cv2.imshow("Imagem para colorir", np.concatenate([cv2.flip(frame, 1), cv2.flip(canvas, 1)], axis=1))
+        elif videocanva and coloringimage:
+            show_canvas = video_canvas(show_canvas, originalframe)
+            cv2.imshow("Tela e Imagem", np.concatenate([cv2.flip(show_canvas, 1), cv2.flip(canvas, 1)], axis=1))
 
-        # Mostra a tela de desenho e a captura de vídeo na mesma janela
-        cv2.imshow("Canvas and Camera", np.concatenate([cv2.flip(show_canvas,1),cv2.flip(frame,1)], axis=1))
 
-        k = cv2.waitKey(1)
-
-
-        
         # Chama a função que toma conta das formas
         if pressing:
             pressing_s, pressing_o, engaged, let_go_sum, canvas = handle_shapes(k, pressing_s, pressing_o, engaged, let_go_sum, canvas, temp_canvas)
 
-        # Teclas de controle
+
+        k = cv2.waitKey(1)
+        # Teclas de Controle
         if k == ord("r") or k == ord("R"):
-            pencil_color = (0,0,255)
+            pencil_color = (0, 0, 255)
             print("Lápis", Fore.RED + "vermelho" + Style.RESET_ALL)
         elif k == ord("g") or k == ord("G"):
-            pencil_color = (0,255,0)
+            pencil_color = (0, 255, 0)
             print("Lápis", Fore.GREEN + "verde" + Style.RESET_ALL)
         elif k == ord("b") or k == ord("B"):
-            pencil_color = (255,0,0)
+            pencil_color = (255, 0, 0)
             print("Lápis", Fore.BLUE + "azul" + Style.RESET_ALL)
         elif k == ord("+"):
             pencil_thickness += 1
             print("Tamanho do lápis:", pencil_thickness)
         elif k == ord("-"):
-            pencil_thickness = max(pencil_thickness - 1,1)
+            pencil_thickness = max(pencil_thickness - 1, 1)
             print("Tamanho do lápis:", pencil_thickness)
         elif k == ord("c") or k == ord("C"):
             canvas.fill(255)
@@ -175,8 +174,9 @@ def main():
         elif k == ord("q") or k == ord("Q"):
             cap.release()
             cv2.destroyAllWindows()
+            print("Fim")
             break
-   
+
 
 
 #  ------------------------------
