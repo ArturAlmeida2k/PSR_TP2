@@ -12,6 +12,7 @@ from colorama import Style, Fore
 #  -----  Helper Functions  -----
 #  ------------------------------
 
+
 # Captura de vídeo
 def start_video_capture():
 
@@ -57,6 +58,7 @@ def get_centroid(contour):
     
     return (cx, cy)
 
+
 # Sobrepor a tela e a captura de vídeo
 def video_canvas(canvas, frame):
     # Tornar o background do canvas preto para poder fazer cv2.add() 
@@ -70,6 +72,48 @@ def video_canvas(canvas, frame):
     
     canvas_frame = np.where(color_mask[..., None], canvas, cv2.add(frame, canvas))
     return canvas_frame
+
+
+# Desenhar formas
+def handle_shapes(k, pressing_s, pressing_o, engaged, let_go_sum, canvas, temp_canvas):
+    # Caso ainda não esteja a registar varios valor para k continuos para e se esteja a mostrar uma forma
+    # for criada isto para dar mais tempo de espera ate que registe os valores corretos para k
+    if not engaged:
+        if k == -1:
+            let_go_sum += 1
+            # Se registar até 5 valores que não sejam os esperados desenha a forma imediatamente
+            if let_go_sum >= 5:
+                pressing_s = False
+                pressing_o = False
+                canvas = temp_canvas.copy()
+                let_go_sum = 0
+        # Se registar um valor esperado torna engaged True e a partir de agora basta registar
+        # Valores para desenhar a forma
+        elif k == ord("s") or k == ord("S") or k == ord("o") or k == ord("O"):
+            engaged = True
+            let_go_sum = 0
+
+    # Estando engaged, ao fim de 2 momentos com o k diferente do botão que devia ser precionado, a forma é desenhada 
+    elif engaged:
+        if pressing_s and not (k == ord("s") or k == ord("S")):
+            let_go_sum += 1
+            if let_go_sum >= 2:
+                pressing_s = False
+                engaged = False
+                canvas = temp_canvas.copy()
+                let_go_sum = 0
+        elif pressing_o and not (k == ord("o") or k == ord("O")):
+            let_go_sum += 1
+            if let_go_sum >= 2:
+                pressing_o = False
+                engaged = False
+                canvas = temp_canvas.copy()
+                let_go_sum = 0
+        else:
+            let_go_sum = 0
+    
+    return pressing_s, pressing_o, engaged, let_go_sum, canvas
+
 
 # Importar uma imagem para colorir
 def number_image(height, width, image_path):
@@ -120,48 +164,8 @@ def number_image(height, width, image_path):
 
     return image
 
-# Desenhar formas
-def handle_shapes(k, pressing_s, pressing_o, engaged, let_go_sum, canvas, temp_canvas):
-    # Caso ainda não esteja a registar varios valor para k continuos para e se esteja a mostrar uma forma
-    # for criada isto para dar mais tempo de espera ate que registe os valores corretos para k
-    if not engaged:
-        if k == -1:
-            let_go_sum += 1
-            # Se registar até 5 valores que não sejam os esperados desenha a forma imediatamente
-            if let_go_sum >= 5:
-                pressing_s = False
-                pressing_o = False
-                canvas = temp_canvas.copy()
-                let_go_sum = 0
-        # Se registar um valor esperado torna engaged True e a partir de agora basta registar
-        # Valores para desenhar a forma
-        elif k == ord("s") or k == ord("S") or k == ord("o") or k == ord("O"):
-            engaged = True
-            let_go_sum = 0
 
-    # Estando engaged, ao fim de 2 momentos com o k diferente do botão que devia ser precionado
-    # a forma é desenhada 
-    elif engaged:
-        if pressing_s and not (k == ord("s") or k == ord("S")):
-            let_go_sum += 1
-            if let_go_sum >= 2:
-                pressing_s = False
-                engaged = False
-                canvas = temp_canvas.copy()
-                let_go_sum = 0
-        elif pressing_o and not (k == ord("o") or k == ord("O")):
-            let_go_sum += 1
-            if let_go_sum >= 2:
-                pressing_o = False
-                engaged = False
-                canvas = temp_canvas.copy()
-                let_go_sum = 0
-        else:
-            let_go_sum = 0
-    
-    return pressing_s, pressing_o, engaged, let_go_sum, canvas
-
-#
+# Fazer a avaliação da pintura
 def evaluate_painting(painted_img):
     output = cv2.connectedComponentsWithStats(painted_img, 4, cv2.CV_32S)
     num_labels = output[0]  # Número da área
@@ -173,7 +177,7 @@ def evaluate_painting(painted_img):
     misses = 0
 
     for i in range(painted_img[1]):
-        for j in range(painted_img[1]):
+        for j in range(painted_img[0]):
             rightColor = labelColors[labels[i, j]]
             if rightColor != (0, 0, 0):
                 if np.array_equal(painted_img[i, j], rightColor):
