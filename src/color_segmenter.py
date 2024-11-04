@@ -14,7 +14,7 @@ def onTrackbar(threshold, mm, C,limits):
 
 # Recolher os valores para a segmentação de cor
 def main():
-    window_name = "Segmentcao de Cor"
+    window_name = "Segmentacao de Cor"
     cv2.namedWindow(window_name)
     capture = cv2.VideoCapture(0)
     limits = {"B": {"max": 100, "min": 0},"G": {"max": 100, "min": 0},"R": {"max": 360, "min": 0}}
