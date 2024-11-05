@@ -40,9 +40,13 @@ def main():
         if k == ord("q") or k == ord("Q"):
             break
         elif k == ord("w") or k == ord("W"):
-            file_name = 'limits.json'
+            file_name = "src/teste/limits.json"
             with open(file_name, 'w') as json_file:
-                print('writing dictionary d to file ' + file_name)
+                print("writing dictionary d to file " + file_name)
+                print( "           VALUES        ")
+                print(f" H -> min: {limits['H']['min']:3}| max: {limits['H']['max']:3}")
+                print(f" S -> min: {limits['S']['min']:3}| max: {limits['S']['max']:3}")
+                print(f" V -> min: {limits['V']['min']:3}| max: {limits['V']['max']:3}")
                 json.dump({"limits": limits}, json_file, indent=4)
 
 
