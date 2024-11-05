@@ -17,28 +17,22 @@ def main():
     window_name = "Segmentacao de Cor"
     cv2.namedWindow(window_name)
     capture = cv2.VideoCapture(0)
-    limits = {"B": {"max": 100, "min": 0},"G": {"max": 100, "min": 0},"R": {"max": 360, "min": 0}}
-    # limits = {"B": {"max": 255, "min": 0},"G": {"max": 255, "min": 0},"R": {"max": 255, "min": 0}}
-    _, frame = capture.read()
-    cv2.createTrackbar("V-min",window_name,limits["B"]["min"],100,lambda threshold: onTrackbar(threshold=int((threshold/100)*255), mm="min", C="B",limits=limits))
-    cv2.createTrackbar("V-max",window_name,limits["B"]["max"],100,lambda threshold: onTrackbar(threshold=int((threshold/100)*255), mm="max", C="B",limits=limits))
-    cv2.createTrackbar("S-min",window_name,limits["G"]["min"],100,lambda threshold: onTrackbar(threshold=int((threshold/100)*255), mm="min", C="G",limits=limits))
-    cv2.createTrackbar("S-max",window_name,limits["G"]["max"],100,lambda threshold: onTrackbar(threshold=int((threshold/100)*255), mm="max", C="G",limits=limits))
-    cv2.createTrackbar("H-min",window_name,limits["R"]["min"],360,lambda threshold: onTrackbar(threshold=int((threshold/360)*255), mm="min", C="R",limits=limits))
-    cv2.createTrackbar("H-max",window_name,limits["R"]["max"],360,lambda threshold: onTrackbar(threshold=int((threshold/360)*255), mm="max", C="R",limits=limits))
-    '''
-    cv2.createTrackbar("B-min",window_name,limits["B"]["min"],255,lambda threshold: onTrackbar(threshold, mm="min", C="B",limits=limits))
-    cv2.createTrackbar("B-max",window_name,limits["B"]["max"],255,lambda threshold: onTrackbar(threshold, mm="max", C="B",limits=limits))
-    cv2.createTrackbar("G-min",window_name,limits["G"]["min"],255,lambda threshold: onTrackbar(threshold, mm="min", C="G",limits=limits))
-    cv2.createTrackbar("G-max",window_name,limits["G"]["max"],255,lambda threshold: onTrackbar(threshold, mm="max", C="G",limits=limits))
-    cv2.createTrackbar("R-min",window_name,limits["R"]["min"],255,lambda threshold: onTrackbar(threshold, mm="min", C="R",limits=limits))
-    cv2.createTrackbar("R-max",window_name,limits["R"]["max"],255,lambda threshold: onTrackbar(threshold, mm="max", C="R",limits=limits))
-    '''
+    limits = {"H": {"max": 179, "min": 0}, "S": {"max": 255, "min": 0}, "V": {"max": 255, "min": 0}}
 
+    _, frame = capture.read()
+    cv2.createTrackbar("H-min", window_name, limits["H"]["min"], 179, lambda threshold: onTrackbar(threshold, mm="min", C="H", limits=limits))
+    cv2.createTrackbar("H-max", window_name, limits["H"]["max"], 179, lambda threshold: onTrackbar(threshold, mm="max", C="H", limits=limits))
+    cv2.createTrackbar("S-min", window_name, limits["S"]["min"], 255, lambda threshold: onTrackbar(threshold, mm="min", C="S", limits=limits))
+    cv2.createTrackbar("S-max", window_name, limits["S"]["max"], 255, lambda threshold: onTrackbar(threshold, mm="max", C="S", limits=limits))
+    cv2.createTrackbar("V-min", window_name, limits["V"]["min"], 255, lambda threshold: onTrackbar(threshold, mm="min", C="V", limits=limits))
+    cv2.createTrackbar("V-max", window_name, limits["V"]["max"], 255, lambda threshold: onTrackbar(threshold, mm="max", C="V", limits=limits))
+    
     while (True):
         _, frame = capture.read() 
 
-        mask = cv2.inRange(cv2.flip(frame, 1),(limits["B"]["min"],limits["G"]["min"],limits["R"]["min"]),(limits["B"]["max"],limits["G"]["max"],limits["R"]["max"]))
+        hsv_frame = cv2.cvtColor(cv2.flip(frame,1),cv2.COLOR_BGR2HSV)
+
+        mask = cv2.inRange(hsv_frame,(limits["H"]["min"], limits["S"]["min"], limits["V"]["min"]),(limits["H"]["max"], limits["S"]["max"], limits["V"]["max"]))
         cv2.imshow(window_name, mask)
 
         k = cv2.waitKey(1)
