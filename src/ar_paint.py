@@ -59,21 +59,21 @@ def main():
     let_go_sum = 0
     
     
-
     # Ciclo para captura de frames e pintura
     while True:
         ret, frame = cap.read()
         if not ret:
             break
         
+        hsv_frame = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
+
         originalframe = frame.copy()
         pressing = pressing_o | pressing_s
 
         # Criação de uma mascara baseado em limites de canais de cor
-        
-        mask = cv2.inRange(frame,
-                           (limits["B"]["min"], limits["G"]["min"], limits["R"]["min"]),
-                           (limits["B"]["max"], limits["G"]["max"], limits["R"]["max"]))
+        mask = cv2.inRange(hsv_frame,
+                           (limits["H"]["min"], limits["S"]["min"], limits["V"]["min"]),
+                           (limits["H"]["max"], limits["S"]["max"], limits["V"]["max"]))
 
         # Interação com a câmara
         largest_contour = get_largest_contour(mask)
