@@ -33,7 +33,8 @@ def main():
     cap = start_video_capture()
 
     ret, frame = cap.read()
-    
+
+    # Definir as dimensões para a area de pintura baseado nas dimensão do video
     height, width, _ = frame.shape
     canvas = create_blank_canvas(width, height)
     
@@ -50,7 +51,7 @@ def main():
     engaged = False
     let_go_sum = 0
 
-
+    # Carregar e apresentar a imagem a colorir se requisitado
     if coloringimage:
         print(Style.BRIGHT + "\nCores para pintar a imagem:" + Style.RESET_ALL)
         print(Fore.GREEN + "\tVerde: " + Style.RESET_ALL + "1")
@@ -58,13 +59,13 @@ def main():
         print(Fore.BLUE + "\tAzul: " + Style.RESET_ALL + "3\n")
         canvas = cv2.flip(number_image(height, width, "./img/flor.jpeg"), 1)
 
-
+    # Ciclo para captura de frames e pintura
     while True:
         ret, frame = cap.read()
         if not ret:
             break
 
-
+        # Criação de uma mascara baseado em limites de canais de cor
         pressing = pressing_e | pressing_o | pressing_s
         mask = cv2.inRange(frame,
                            (limits["B"]["min"], limits["G"]["min"], limits["R"]["min"]),
@@ -123,7 +124,7 @@ def main():
 
 
         originalframe = frame.copy()
-        # Mostrar janelas
+        # Mostrar janelas conforme as configurações iniciais
         if videocanva and not coloringimage:
             show_canvas = video_canvas(show_canvas, originalframe)
             cv2.imshow("Tela Branca", np.concatenate([cv2.flip(show_canvas, 1), cv2.flip(canvas, 1)], axis=1))
