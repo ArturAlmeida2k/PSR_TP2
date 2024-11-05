@@ -36,9 +36,17 @@ def main():
 
     # Definir as dimensões para a area de pintura baseado nas dimensão do video
     height, width, _ = frame.shape
-    canvas = create_blank_canvas(width, height)
     
-    
+    if coloringimage:
+        # Carregar e apresentar a imagem a colorir se requisitado
+        print(Style.BRIGHT + "\nCores para pintar a imagem:" + Style.RESET_ALL)
+        print(Fore.GREEN + "\tVerde: " + Style.RESET_ALL + "1")
+        print(Fore.RED + "\tVermelho: " + Style.RESET_ALL + "2")
+        print(Fore.BLUE + "\tAzul: " + Style.RESET_ALL + "3\n")
+        canvas = cv2.flip(blank_coloring_image(height, width, "./img/flor.jpeg"), 1)
+    else:
+        canvas = create_blank_canvas(width, height)
+
     # Variáveis para o lápis
     last_centroid = None  # Ponto anterior (para desenhar linhas)
     pencil_color = (0, 0, 255)  # Cor do lápis a vermelho
@@ -47,26 +55,22 @@ def main():
     # Variáveis para as formas
     pressing_s = False
     pressing_o = False
-    pressing_e = False
     engaged = False
     let_go_sum = 0
-
-    # Carregar e apresentar a imagem a colorir se requisitado
-    if coloringimage:
-        print(Style.BRIGHT + "\nCores para pintar a imagem:" + Style.RESET_ALL)
-        print(Fore.GREEN + "\tVerde: " + Style.RESET_ALL + "1")
-        print(Fore.RED + "\tVermelho: " + Style.RESET_ALL + "2")
-        print(Fore.BLUE + "\tAzul: " + Style.RESET_ALL + "3\n")
-        canvas = cv2.flip(number_image(height, width, "./img/flor.jpeg"), 1)
+    
+    
 
     # Ciclo para captura de frames e pintura
     while True:
         ret, frame = cap.read()
         if not ret:
             break
+        
+        originalframe = frame.copy()
+        pressing = pressing_o | pressing_s
 
         # Criação de uma mascara baseado em limites de canais de cor
-        pressing = pressing_e | pressing_o | pressing_s
+        
         mask = cv2.inRange(frame,
                            (limits["B"]["min"], limits["G"]["min"], limits["R"]["min"]),
                            (limits["B"]["max"], limits["G"]["max"], limits["R"]["max"]))
@@ -123,24 +127,28 @@ def main():
             show_canvas = canvas.copy()
 
 
-        originalframe = frame.copy()
+        
         # Mostrar janelas conforme as configurações iniciais
-        if videocanva and not coloringimage:
+        if not videocanva and not coloringimage:
+            cv2.imshow("Tela Branca", np.concatenate([cv2.flip(frame, 1), cv2.flip(show_canvas, 1)], axis=1))
+        elif videocanva and not coloringimage:
             show_canvas = video_canvas(show_canvas, originalframe)
-            cv2.imshow("Tela Branca", np.concatenate([cv2.flip(show_canvas, 1), cv2.flip(canvas, 1)], axis=1))
+            cv2.imshow("Tela Branca", np.concatenate([cv2.flip(frame, 1), cv2.flip(show_canvas, 1)], axis=1))
         elif coloringimage and not videocanva:
-            cv2.imshow("Imagem para colorir", np.concatenate([cv2.flip(frame, 1), cv2.flip(canvas, 1)], axis=1))
+            cv2.imshow("Imagem para colorir", np.concatenate([cv2.flip(frame, 1), cv2.flip(show_canvas, 1)], axis=1))
         elif videocanva and coloringimage:
             show_canvas = video_canvas(show_canvas, originalframe)
-            cv2.imshow("Tela e Imagem", np.concatenate([cv2.flip(show_canvas, 1), cv2.flip(canvas, 1)], axis=1))
+            cv2.imshow("Tela e Imagem", np.concatenate([cv2.flip(frame, 1), cv2.flip(show_canvas, 1)], axis=1))
 
+        
+        k = cv2.waitKey(1)
 
         # Chama a função que toma conta das formas
         if pressing:
             pressing_s, pressing_o, engaged, let_go_sum, canvas = handle_shapes(k, pressing_s, pressing_o, engaged, let_go_sum, canvas, temp_canvas)
 
 
-        k = cv2.waitKey(1)
+        
         # Teclas de Controle
         if k == ord("r") or k == ord("R"):
             pencil_color = (0, 0, 255)
@@ -155,7 +163,7 @@ def main():
             print("Lápis", Fore.BLUE + "azul" + Style.RESET_ALL)
 
         elif k == ord("+"):
-            pencil_thickness += 1
+            pencil_thickness = min(pencil_thickness + 1, 25)
             print("Tamanho do lápis:", pencil_thickness)
 
         elif k == ord("-"):
@@ -163,7 +171,10 @@ def main():
             print("Tamanho do lápis:", pencil_thickness)
 
         elif k == ord("c") or k == ord("C"):
-            canvas.fill(255)
+            if coloringimage:
+                canvas = cv2.flip(blank_coloring_image(height, width, "./img/flor.jpeg"), 1)
+            else:
+                canvas.fill(255)
             print("Tela limpa")
 
         elif k == ord("w") or k == ord("W"):

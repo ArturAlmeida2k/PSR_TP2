@@ -61,6 +61,9 @@ def get_centroid(contour):
 
 # Sobrepor a tela e a captura de vídeo
 def video_canvas(canvas, frame):
+
+    black_mask = np.all(canvas == [0,0,0], axis=-1)
+
     # Tornar o background do canvas preto para poder fazer cv2.add() 
     canvas[np.all(canvas == [255, 255, 255], axis=-1)] = [0, 0, 0]
     
@@ -68,7 +71,7 @@ def video_canvas(canvas, frame):
     red_mask = np.all(canvas == [0, 0, 255], axis=-1)
     green_mask = np.all(canvas == [0, 255, 0], axis=-1)
     blue_mask = np.all(canvas == [255, 0, 0], axis=-1)
-    color_mask = red_mask | green_mask | blue_mask
+    color_mask = black_mask | red_mask | green_mask | blue_mask
     
     canvas_frame = np.where(color_mask[..., None], canvas, cv2.add(frame, canvas))
     return canvas_frame
@@ -78,11 +81,13 @@ def video_canvas(canvas, frame):
 def handle_shapes(k, pressing_s, pressing_o, engaged, let_go_sum, canvas, temp_canvas):
     # Caso ainda não esteja a registar varios valor para k continuos para e se esteja a mostrar uma forma
     # for criada isto para dar mais tempo de espera ate que registe os valores corretos para k
+    
+    
     if not engaged:
         if k == -1:
             let_go_sum += 1
             # Se registar até 5 valores que não sejam os esperados desenha a forma imediatamente
-            if let_go_sum >= 5:
+            if let_go_sum >= 20:
                 pressing_s = False
                 pressing_o = False
                 canvas = temp_canvas.copy()
@@ -116,7 +121,8 @@ def handle_shapes(k, pressing_s, pressing_o, engaged, let_go_sum, canvas, temp_c
 
 
 # Importar uma imagem para colorir
-def number_image(height, width, image_path):
+def blank_coloring_image(height, width, image_path):
+
     image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
     image = cv2.resize(image, (int(image.shape[1] * height / image.shape[0]), height))
 
