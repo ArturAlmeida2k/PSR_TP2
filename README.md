@@ -1,6 +1,6 @@
 # PSR_TP2
 
-Programa de pintura baseado em realidade aumentada
+Programa de pintura baseado em realidade aumentada /n
 Para iniciar, abrir o ficheiro ar_paint.py com python3 e o argumento -h, para instuções de ajuda
 python3 ar_pain.py -h
 
