@@ -31,12 +31,13 @@ def main():
 
     # Iniciar captura de vídeo
     cap = start_video_capture()
-
+    cap.set(3,640)
+    cap.set(4,480)
     ret, frame = cap.read()
 
     # Definir as dimensões para a area de pintura baseado nas dimensão do video
     height, width, _ = frame.shape
-    
+    print(height, " ",width)
     if coloringimage:
         # Carregar e apresentar a imagem a colorir se requisitado
         print(Style.BRIGHT + "\nCores para pintar a imagem:" + Style.RESET_ALL)
