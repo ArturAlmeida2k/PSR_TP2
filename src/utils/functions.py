@@ -141,6 +141,7 @@ def blank_coloring_image(height, width, image_path):
     # Escrever os números nos vários espaços em branco
     labelColors = [None] * num_labels
     fontScale = (width * height) / (450 * 450) / 2
+    print(fontScale)
     for i in range(1, len(centroids)):
         if labelColors[i] != (0, 0, 0) and i == 1:
             cv2.putText(image,
