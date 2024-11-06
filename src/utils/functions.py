@@ -125,30 +125,29 @@ def blank_coloring_image(height, width, image_path):
     image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
     image = cv2.resize(image, (int(image.shape[1] * height / image.shape[0]), height))
 
-    ret, thresh = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    _, thresh = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
     image = np.zeros((height, width)).astype(np.uint8)
+    image.fill(255)
+
     image[:, int(width / 2 - thresh.shape[1] / 2):int(width / 2 + thresh.shape[1] / 2)] = thresh
 
     # Usar connectedComponentWithStats para encontrar os espaços em branco
-    output = cv2.connectedComponentsWithStats(image, 4, cv2.CV_32S)
-
-    num_labels = output[0]  # Número da área
-    centroids = output[3]   # Centro da área
-
+    num_labels, _, _, centroids = cv2.connectedComponentsWithStats(image, 4, cv2.CV_32S)
 
     # Escrever os números nos vários espaços em branco
     labelColors = [None] * num_labels
-    fontScale = (width * height)/460800
+    fontScale = (width * height)/(350*350)/2
+    thickness = 2
     for i in range(1, len(centroids)):
         if labelColors[i] != (0, 0, 0) and i == 1:
             cv2.putText(image,
                         str(i),
-                        (int(width/3.6), int(height/9)),
+                        (85, 100),
                         cv2.FONT_HERSHEY_COMPLEX_SMALL,
                         fontScale,
                         (0, 0, 0),
-                        4)
+                        thickness)
         elif labelColors[i] != (0, 0, 0) and i != 5:
             cv2.putText(image,
                         str(2),
@@ -156,7 +155,7 @@ def blank_coloring_image(height, width, image_path):
                         cv2.FONT_HERSHEY_COMPLEX_SMALL,
                         fontScale,
                         (0, 0, 0),
-                        4)
+                        thickness)
         else:
             cv2.putText(image,
                         str(3),
@@ -164,7 +163,7 @@ def blank_coloring_image(height, width, image_path):
                         cv2.FONT_HERSHEY_COMPLEX_SMALL,
                         fontScale,
                         (0, 0, 0),
-                        4)
+                        thickness)
 
     image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
 
@@ -172,19 +171,54 @@ def blank_coloring_image(height, width, image_path):
 
 
 # Fazer a avaliação da pintura
-def evaluate_painting(painted_img):
-    output = cv2.connectedComponentsWithStats(painted_img, 4, cv2.CV_32S)
-    num_labels = output[0]  # Número da área
-    labels = output[1]  # label matrix
+def evaluate_painting(height, width, painted_img, original_img):
+    #print(height, width)
+    
 
+    #colors = [(0, 0, 255), (0, 255, 0), (255, 0, 0)]
+    #labelColors = [None] * num_labels
+
+    '''for i in range(height):
+        for j in range(width):
+            if not labelColors[labels[i][j]]:
+                if image[i][j] == 0:
+                    labelColors[labels[i][j]] = (0, 0, 0)
+                else:
+                    labelColors[labels[i][j]] = colors[random.randint(0,2)]
+'''
+    #print(painted_img[1])
+    #print(painted_img[0])
+    #print(original_img)
+    img = cv2.imread(original_img, cv2.IMREAD_GRAYSCALE)
+    img = cv2.resize(img, (int(img.shape[1] * height / img.shape[0]), height))
+    #print()
+    #print(paint_img)
+    #painted_img = cv2.imread(painted_img, cv2.IMREAD_GRAYSCALE)
+    #print()
+    #print(painted_img)
+    
+    
+
+    _, thresh = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+    img = np.zeros((height, width)).astype(np.uint8)
+    img.fill(255)
+
+    img[:, int(width / 2 - thresh.shape[1] / 2):int(width / 2 + thresh.shape[1] / 2)] = thresh
+    
+    num_labels, labels, _, _ = cv2.connectedComponentsWithStats(img, 4, cv2.CV_32S)
+    print(labels)
     labelColors = [None] * num_labels
 
     hits = 0
     misses = 0
 
-    for i in range(painted_img[1]):
-        for j in range(painted_img[0]):
-            rightColor = labelColors[labels[i, j]]
+    for i in range(len(painted_img[1])):
+        for j in range(len(painted_img[0])):
+            label = labels[i, j]
+            print("L", label)
+            rightColor = labelColors[label]
+            #print("R", rightColor)
             if rightColor != (0, 0, 0):
                 if np.array_equal(painted_img[i, j], rightColor):
                     hits += 1

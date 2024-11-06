@@ -33,18 +33,20 @@ def main():
     cap = start_video_capture()
     cap.set(3,640)
     cap.set(4,480)
-    ret, frame = cap.read()
+    frame = cap.read()[1]
 
     # Definir as dimensões para a area de pintura baseado nas dimensão do video
-    height, width, _ = frame.shape
-    print(height, " ",width)
+    height, width, _ = cap.read()[1].shape
+
+    
     if coloringimage:
         # Carregar e apresentar a imagem a colorir se requisitado
         print(Style.BRIGHT + "\nCores para pintar a imagem:" + Style.RESET_ALL)
         print(Fore.GREEN + "\tVerde: " + Style.RESET_ALL + "1")
         print(Fore.RED + "\tVermelho: " + Style.RESET_ALL + "2")
         print(Fore.BLUE + "\tAzul: " + Style.RESET_ALL + "3\n")
-        canvas = cv2.flip(blank_coloring_image(height, width, "./img/flor.jpeg"), 1)
+        image_path = "./img/flor.jpeg"
+        canvas = cv2.flip(blank_coloring_image(height, width, image_path), 1)
     else:
         canvas = create_blank_canvas(width, height)
 
@@ -176,18 +178,19 @@ def main():
                 canvas = cv2.flip(blank_coloring_image(height, width, "./img/flor.jpeg"), 1)
             else:
                 canvas.fill(255)
-            print("Tela limpa")
+            print("\nTela limpa")
 
         elif k == ord("w") or k == ord("W"):
             now = datetime.now()
             formatted_time = now.strftime("drawing_%a_%b_%d_%H:%M:%S_%Y.png")
             # Salvar a imagem da tela com o nome formatado
             cv2.imwrite(formatted_time, cv2.flip(canvas, 1))
-            print(f"Imagem salva como {formatted_time}")
+            print(f"\nImagem salva como {formatted_time}")
+            print(height, width)
             # Fazer a avaliação
-            if evaluation:
-                score = evaluate_painting("./drawing_Sun_Nov_03_20:54:29_2024.png") # PARA TESTAR DEPOIS POR "formatted_time"
-                print(f"Precisão da pintura: {score:.2f}%")
+            if evaluation and coloringimage:
+                score = evaluate_painting(height, width, canvas, image_path)
+                print(f"\nPrecisão da pintura: {score:.2f}%")
 
         elif (k == ord("s") or k == ord("S")) and not pressing and largest_contour is not None:
             pressing_s = True
@@ -200,7 +203,7 @@ def main():
         elif k == ord("q") or k == ord("Q"):
             cap.release()
             cv2.destroyAllWindows()
-            print("Fim")
+            print("\nFim")
             break
 
 
