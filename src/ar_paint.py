@@ -150,7 +150,7 @@ def main():
 
 
         
-        # Teclas de Controle
+        # Teclas de controle de cor, grossura de pincel, limpeza de tela e guardar imagem
         if k == ord("r") or k == ord("R"):
             pencil_color = (0, 0, 255)
             print("Lápis", Fore.RED + "vermelho" + Style.RESET_ALL)
