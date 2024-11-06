@@ -141,15 +141,16 @@ def blank_coloring_image(height, width, image_path):
     # Escrever os números nos vários espaços em branco
     labelColors = [None] * num_labels
     fontScale = (width * height) / (450 * 450) / 2
-    cv2.putText(image,
-                str(1),
-                (345, 205),
-                cv2.FONT_HERSHEY_COMPLEX_SMALL,
-                fontScale,
-                (0, 0, 0),
-                3)
-    for i in range(2, len(centroids)):
-        if labelColors[i] != (0, 0, 0) and i != 5:
+    for i in range(1, len(centroids)):
+        if labelColors[i] != (0, 0, 0) and i == 1:
+            cv2.putText(image,
+                        str(i),
+                        (int(centroids[i][0] - fontScale * 130), int(centroids[i][1] - fontScale * 70)),
+                        cv2.FONT_HERSHEY_COMPLEX_SMALL,
+                        fontScale,
+                        (0, 0, 0),
+                        3)
+        elif labelColors[i] != (0, 0, 0) and i != 5:
             cv2.putText(image,
                         str(2),
                         (int(centroids[i][0] - fontScale * 14), int(centroids[i][1] + fontScale * 14)),
@@ -160,7 +161,7 @@ def blank_coloring_image(height, width, image_path):
         else:
             cv2.putText(image,
                         str(3),
-                        (int(centroids[i][0] - fontScale * 14), int(centroids[i][1] + fontScale * 14)),
+                        (int(centroids[i][0] - fontScale * 13), int(centroids[i][1] + fontScale * 13)),
                         cv2.FONT_HERSHEY_COMPLEX_SMALL,
                         fontScale,
                         (0, 0, 0),
