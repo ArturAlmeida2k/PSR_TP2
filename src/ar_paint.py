@@ -202,7 +202,7 @@ def main():
         elif k == ord("q") or k == ord("Q"):
             cap.release()
             cv2.destroyAllWindows()
-            print("\nFim")
+            print("\nFIM!\n")
             break
 
 
