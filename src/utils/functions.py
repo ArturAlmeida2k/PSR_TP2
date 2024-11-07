@@ -141,7 +141,7 @@ def handle_shapes(k, pressing_s, pressing_o, engaged, let_go_sum, canvas, temp_c
     if not engaged:
         if k == -1:
             let_go_sum += 1
-            # Se registar até 5 valores que não sejam os esperados desenha a forma imediatamente
+            # Se registar até 20 valores que não sejam os esperados desenha a forma imediatamente
             if let_go_sum >= 20:
                 pressing_s = False
                 pressing_o = False
