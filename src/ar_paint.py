@@ -36,24 +36,21 @@ def main():
     frame = cap.read()[1]
 
     # Definir as dimensões para a area de pintura baseado nas dimensão do video
-    height, width, _ = cap.read()[1].shape
+    height, width, _ = frame.shape
 
+    program_initialization(shake, videocanva, coloringimage, evaluation)
     
     if coloringimage:
         # Carregar e apresentar a imagem a colorir se requisitado
-        print(Style.BRIGHT + "\nCores para pintar a imagem:" + Style.RESET_ALL)
-        print(Fore.GREEN + "\tVerde: " + Style.RESET_ALL + "1")
-        print(Fore.RED + "\tVermelho: " + Style.RESET_ALL + "2")
-        print(Fore.BLUE + "\tAzul: " + Style.RESET_ALL + "3\n")
         image_path = "./img/flor.jpeg"
         canvas = cv2.flip(blank_coloring_image(height, width, image_path), 1)
     else:
         canvas = create_blank_canvas(width, height)
 
     # Variáveis para o lápis
-    last_centroid = None  # Ponto anterior (para desenhar linhas)
-    pencil_color = (0, 0, 255)  # Cor do lápis a vermelho
-    pencil_thickness = 5  # Espessura da linha
+    last_centroid = None  
+    pencil_color = (0, 0, 255)  
+    pencil_thickness = 5  
 
     # Variáveis para as formas
     pressing_s = False
@@ -150,7 +147,6 @@ def main():
         if pressing:
             pressing_s, pressing_o, engaged, let_go_sum, canvas = handle_shapes(k, pressing_s, pressing_o, engaged, let_go_sum, canvas, temp_canvas)
 
-
         
         # Teclas de controle de cor, grossura de pincel, limpeza de tela e guardar imagem
         if k == ord("r") or k == ord("R"):
@@ -184,7 +180,7 @@ def main():
             now = datetime.now()
             formatted_time = now.strftime("drawing_%a_%b_%d_%H:%M:%S_%Y.png")
             # Salvar a imagem da tela com o nome formatado
-            cv2.imwrite(formatted_time, cv2.flip(canvas, 1))
+            cv2.imwrite(formatted_time, cv2.flip(show_canvas, 1))
             print(f"\nImagem salva como {formatted_time}")
             print(height, width)
             # Fazer a avaliação
@@ -199,6 +195,9 @@ def main():
         elif (k == ord("o") or k == ord("O")) and not pressing and largest_contour is not None:
             pressing_o = True
             figure_initial = centroid
+
+        elif (k == ord("h")) or k == ord("H"):
+            print_commands()
 
         elif k == ord("q") or k == ord("Q"):
             cap.release()

@@ -10,8 +10,6 @@ from colorama import Style, Fore
 #  ------------------------------
 #  -----  Helper Functions  -----
 #  ------------------------------
-
-
 # Captura de vídeo
 def start_video_capture():
 
@@ -23,6 +21,64 @@ def start_video_capture():
         exit()
 
     return cap
+
+# Mostrar como foi inicializado o programa
+def program_initialization(shake, videocanva, coloringimage, evaluation):
+    print("Programa inicializado com os seguintes parametros:")
+
+    if shake:
+        color = Fore.GREEN
+    else:
+        color = Fore.RED
+    print("Shake Prevention:",color,shake,Style.RESET_ALL)
+
+    if videocanva:
+        color = Fore.GREEN
+    else:
+        color = Fore.RED
+    print("Video Canva:",color,videocanva,Style.RESET_ALL)
+
+    if coloringimage:
+        color = Fore.GREEN
+    else:
+        color = Fore.RED
+    print("Coloring Image:",color,coloringimage,Style.RESET_ALL)
+
+    if coloringimage:
+
+        if evaluation:
+            color = Fore.GREEN
+        else:
+            color = Fore.RED
+        print("Evaluation:",color,evaluation, Style.RESET_ALL)
+
+        if evaluation:
+            print("A precisão de pintura seŕa realizada ao salvar a imagem (w)")
+        print(Style.BRIGHT + "\nCores para pintar a imagem:" + Style.RESET_ALL)
+        print(Fore.GREEN + "\tVerde: " + Style.RESET_ALL + "1")
+        print(Fore.RED + "\tVermelho: " + Style.RESET_ALL + "2")
+        print(Fore.BLUE + "\tAzul: " + Style.RESET_ALL + "3\n")
+    
+    if evaluation and not coloringimage:
+        print(Fore.RED + "Não é possivel fazer a precisão da pintura se o programa não for iniciado com uma imagem para colorir" + Style.RESET_ALL)
+        
+    print("Precione 'h' para ver os comandos disponíveis")
+
+# Mostra todos os comandos possiveis    
+def print_commands():
+    print("Comandos disponíveis:")
+    print("R/r - Muda a cor do lápis para vermelho.")
+    print("G/g - Muda a cor do lápis para verde.")
+    print("B/b - Muda a cor do lápis para azul.")
+    print("+ - Aumenta a grossura do lápis (máximo 25).")
+    print("- - Diminui a grossura do lápis (mínimo 1).")
+    print("C/c - Limpa a tela.")
+    print("W/w - Salva a imagem atual.")
+    print("S/s - Inicia uma ação específica relacionada à maior contorno, se aplicável.")
+    print("O/o - Inicia outra ação específica relacionada à maior contorno, se aplicável.")
+    print("H/h - Mostra a lista de comandos disponíveis.")
+    print("Q/q - Fecha o programa.\n\n")
+    
 
 # Criar uma tela em branco com o mesmo tamanho da captura de vídeo
 def create_blank_canvas(width, height):
@@ -170,66 +226,7 @@ def blank_coloring_image(height, width, image_path):
     return image
 
 
-# Fazer a avaliação da pintura
-def evaluate_painting(height, width, painted_img, original_img):
-    #print(height, width)
-    
-
-    #colors = [(0, 0, 255), (0, 255, 0), (255, 0, 0)]
-    #labelColors = [None] * num_labels
-
-    '''for i in range(height):
-        for j in range(width):
-            if not labelColors[labels[i][j]]:
-                if image[i][j] == 0:
-                    labelColors[labels[i][j]] = (0, 0, 0)
-                else:
-                    labelColors[labels[i][j]] = colors[random.randint(0,2)]
-'''
-    #print(painted_img[1])
-    #print(painted_img[0])
-    #print(original_img)
-    img = cv2.imread(original_img, cv2.IMREAD_GRAYSCALE)
-    img = cv2.resize(img, (int(img.shape[1] * height / img.shape[0]), height))
-    #print()
-    #print(paint_img)
-    #painted_img = cv2.imread(painted_img, cv2.IMREAD_GRAYSCALE)
-    #print()
-    #print(painted_img)
-    
-    
-
-    _, thresh = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-
-    img = np.zeros((height, width)).astype(np.uint8)
-    img.fill(255)
-
-    img[:, int(width / 2 - thresh.shape[1] / 2):int(width / 2 + thresh.shape[1] / 2)] = thresh
-    
-    num_labels, labels, _, _ = cv2.connectedComponentsWithStats(img, 4, cv2.CV_32S)
-    print(labels)
-    labelColors = [None] * num_labels
-
-    hits = 0
-    misses = 0
-
-    for i in range(len(painted_img[1])):
-        for j in range(len(painted_img[0])):
-            label = labels[i, j]
-            print("L", label)
-            rightColor = labelColors[label]
-            #print("R", rightColor)
-            if rightColor != (0, 0, 0):
-                if np.array_equal(painted_img[i, j], rightColor):
-                    hits += 1
-                else:
-                    misses += 1
-
-    precision = str(round(hits / (hits + misses), 3))
-
-    return precision
-
-
+# Função para vereficar a precisão de pintura
 def evaluate_coloring_image(image, image_path):
     
     control_image = cv2.imread(image_path, cv2.IMREAD_COLOR)
@@ -249,5 +246,5 @@ def evaluate_coloring_image(image, image_path):
 
     # Calcular a percentagem de pixeis iguais
     score = same_pixels/total_pixels*100
-    
+
     return(score)
