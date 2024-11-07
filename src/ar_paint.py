@@ -182,7 +182,6 @@ def main():
             # Salvar a imagem da tela com o nome formatado
             cv2.imwrite(formatted_time, cv2.flip(show_canvas, 1))
             print(f"\nImagem salva como {formatted_time}")
-            print(height, width)
             # Fazer a avaliação
             if evaluation and coloringimage:
                 score = evaluate_coloring_image(canvas,"img/flor_pintada.jpeg")

@@ -40,7 +40,7 @@ def main():
         if k == ord("q") or k == ord("Q"):
             break
         elif k == ord("w") or k == ord("W"):
-            file_name = "src/teste/limits.json"
+            file_name = "limits.json"
             with open(file_name, 'w') as json_file:
                 print("writing dictionary d to file " + file_name)
                 print( "           VALUES        ")
