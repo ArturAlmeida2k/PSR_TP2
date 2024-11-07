@@ -228,3 +228,26 @@ def evaluate_painting(height, width, painted_img, original_img):
     precision = str(round(hits / (hits + misses), 3))
 
     return precision
+
+
+def evaluate_coloring_image(image, image_path):
+    
+    control_image = cv2.imread(image_path, cv2.IMREAD_COLOR)
+
+    height, width, _ = image.shape
+
+    # Converter a imagem para porpuções iguais
+    control_image = cv2.resize(control_image, (int(control_image.shape[1] * height / control_image.shape[0]), height))
+
+    control_image = cv2.copyMakeBorder(control_image, top=0, bottom=0, left=int((width-control_image.shape[1])/2), right=int((width-control_image.shape[1])/2), borderType=cv2.BORDER_CONSTANT, value=(0,255,0))
+
+    # Comparar os pixels e contar os iguais 
+    
+    same_pixels = np.sum(control_image == image) // 3  
+
+    total_pixels = height * width
+
+    # Calcular a percentagem de pixeis iguais
+    score = same_pixels/total_pixels*100
+    
+    return(score)

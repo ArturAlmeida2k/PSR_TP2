@@ -189,7 +189,7 @@ def main():
             print(height, width)
             # Fazer a avaliação
             if evaluation and coloringimage:
-                score = evaluate_painting(height, width, canvas, image_path)
+                score = evaluate_coloring_image(canvas,"img/flor_pintada.jpeg")
                 print(f"\nPrecisão da pintura: {score:.2f}%")
 
         elif (k == ord("s") or k == ord("S")) and not pressing and largest_contour is not None:
