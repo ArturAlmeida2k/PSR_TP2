@@ -24,7 +24,7 @@ def start_video_capture():
 
 # Mostrar como foi inicializado o programa
 def program_initialization(shake, videocanva, coloringimage, evaluation):
-    print("Programa inicializado com os seguintes parametros:")
+    print("\nPrograma inicializado com os seguintes parametros:")
 
     if shake:
         color = Fore.GREEN
@@ -53,31 +53,32 @@ def program_initialization(shake, videocanva, coloringimage, evaluation):
         print("Evaluation:",color,evaluation, Style.RESET_ALL)
 
         if evaluation:
-            print("A precisão de pintura seŕa realizada ao salvar a imagem (w)")
+            print("\nA precisão de pintura será realizada depois de salvar a imagem.")
+            print("Para salvar a imagem pressione 'w'.")
         print(Style.BRIGHT + "\nCores para pintar a imagem:" + Style.RESET_ALL)
         print(Fore.GREEN + "\tVerde: " + Style.RESET_ALL + "1")
         print(Fore.RED + "\tVermelho: " + Style.RESET_ALL + "2")
         print(Fore.BLUE + "\tAzul: " + Style.RESET_ALL + "3\n")
     
     if evaluation and not coloringimage:
-        print(Fore.RED + "Não é possivel fazer a precisão da pintura se o programa não for iniciado com uma imagem para colorir" + Style.RESET_ALL)
+        print(Fore.RED + "\nNão é possivel fazer a precisão da pintura se o programa não for iniciado com uma imagem para colorir!" + Style.RESET_ALL)
         
-    print("Precione 'h' para ver os comandos disponíveis")
+    print("\nPrecione 'h' para ver os comandos disponíveis")
 
 # Mostra todos os comandos possiveis    
 def print_commands():
-    print("Comandos disponíveis:")
-    print("R/r - Muda a cor do lápis para vermelho.")
-    print("G/g - Muda a cor do lápis para verde.")
-    print("B/b - Muda a cor do lápis para azul.")
-    print("+ - Aumenta a grossura do lápis (máximo 25).")
-    print("- - Diminui a grossura do lápis (mínimo 1).")
-    print("C/c - Limpa a tela.")
-    print("W/w - Salva a imagem atual.")
-    print("S/s - Inicia uma ação específica relacionada à maior contorno, se aplicável.")
-    print("O/o - Inicia outra ação específica relacionada à maior contorno, se aplicável.")
-    print("H/h - Mostra a lista de comandos disponíveis.")
-    print("Q/q - Fecha o programa.\n\n")
+    print("\nComandos disponíveis:")
+    print("'+' - Aumenta a grossura do lápis (máximo 25).")
+    print("'-' - Diminui a grossura do lápis (mínimo 1).")
+    print("'R/r' - Muda a cor do lápis para vermelho.")
+    print("'G/g' - Muda a cor do lápis para verde.")
+    print("'B/b' - Muda a cor do lápis para azul.")
+    print("'C/c' - Limpa a tela.")
+    print("'W/w' - Salva a imagem atual.")
+    print("'S/s' - Inicia uma ação específica relacionada à maior contorno, se aplicável.")
+    print("'O/o' - Inicia outra ação específica relacionada à maior contorno, se aplicável.")
+    print("'H/h' - Mostra a lista de comandos disponíveis.")
+    print("'Q/q' - Fecha o programa.\n\n")
     
 
 # Criar uma tela em branco com o mesmo tamanho da captura de vídeo
@@ -135,9 +136,7 @@ def video_canvas(canvas, frame):
 # Desenhar formas
 def handle_shapes(k, pressing_s, pressing_o, engaged, let_go_sum, canvas, temp_canvas):
     # Caso ainda não esteja a registar varios valor para k continuos para e se esteja a mostrar uma forma
-    # for criada isto para dar mais tempo de espera ate que registe os valores corretos para k
-    
-    
+    # for criada isto para dar mais tempo de espera ate que registe os valores corretos para k 
     if not engaged:
         if k == -1:
             let_go_sum += 1
